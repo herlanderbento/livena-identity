@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  livena.identity_api:
+    build:
+      context: ./src
+      dockerfile: Livena.Identity.Api/Dockerfile
+    container_name: livena.identity_api
+    depends_on:
+      livena.identity_db:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__IdentityDb=Host=livena.identity_db;Port=5432;Database=livena.identity_db;Username=livena.identity_user;Password=livena.identity_password
+    ports:
+      - "8080:80"
+    restart: always
+
+  livena.identity_db:
+    image: postgres:16
+    container_name: identity_db
+    hostname: localhost
+    environment:
+      POSTGRES_DB: livena.identity_db
+      POSTGRES_USER: livena.identity_user
+      POSTGRES_PASSWORD: livena.identity_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U livena.identity_user -d livena.identity_db"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+volumes:
+  postgres_data:

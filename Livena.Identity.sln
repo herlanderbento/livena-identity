@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CD96272F-EF1A-4F18-AD12-CD216499E6D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Livena.Identity.Domain", "src\Livena.Identity.Domain\Livena.Identity.Domain.csproj", "{3444315A-3496-4EC0-B953-DA276C3562C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Livena.Identity.infra", "src\Livena.Identity.infra\Livena.Identity.infra.csproj", "{EB7A2A19-9CEC-48DC-8B71-1CDEC9A65BF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Livena.Identity.Application", "src\Livena.Identity.Application\Livena.Identity.Application.csproj", "{8D10D2BD-217F-4069-B8CB-58D0647E53A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Livena.Identity.Api", "src\Livena.Identity.Api\Livena.Identity.Api.csproj", "{1FFEAE98-EFAF-4147-A6A6-AD46AA32195D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3444315A-3496-4EC0-B953-DA276C3562C8} = {CD96272F-EF1A-4F18-AD12-CD216499E6D7}
+		{EB7A2A19-9CEC-48DC-8B71-1CDEC9A65BF1} = {CD96272F-EF1A-4F18-AD12-CD216499E6D7}
+		{8D10D2BD-217F-4069-B8CB-58D0647E53A5} = {CD96272F-EF1A-4F18-AD12-CD216499E6D7}
+		{1FFEAE98-EFAF-4147-A6A6-AD46AA32195D} = {CD96272F-EF1A-4F18-AD12-CD216499E6D7}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3444315A-3496-4EC0-B953-DA276C3562C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3444315A-3496-4EC0-B953-DA276C3562C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3444315A-3496-4EC0-B953-DA276C3562C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3444315A-3496-4EC0-B953-DA276C3562C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB7A2A19-9CEC-48DC-8B71-1CDEC9A65BF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB7A2A19-9CEC-48DC-8B71-1CDEC9A65BF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB7A2A19-9CEC-48DC-8B71-1CDEC9A65BF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB7A2A19-9CEC-48DC-8B71-1CDEC9A65BF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D10D2BD-217F-4069-B8CB-58D0647E53A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D10D2BD-217F-4069-B8CB-58D0647E53A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D10D2BD-217F-4069-B8CB-58D0647E53A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D10D2BD-217F-4069-B8CB-58D0647E53A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FFEAE98-EFAF-4147-A6A6-AD46AA32195D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FFEAE98-EFAF-4147-A6A6-AD46AA32195D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FFEAE98-EFAF-4147-A6A6-AD46AA32195D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FFEAE98-EFAF-4147-A6A6-AD46AA32195D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

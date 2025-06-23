@@ -1,0 +1,6 @@
+@Livena.Identity.Api_HostAddress = http://localhost:5179
+
+GET {{Livena.Identity.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

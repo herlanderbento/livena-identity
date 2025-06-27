@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Livena.Identity.Domain\Livena.Identity.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -6,6 +6,7 @@ namespace Livena.Identity.Domain.Entity;
 
 public class User: AggregateRoot
 {
+    public string Username { get; private set; }
     public string Email { get; private set; }
     public string? Phone { get; private set;  }
     public string Password { get; private set; }
@@ -18,6 +19,7 @@ public class User: AggregateRoot
 
 
     public User(
+        string username,
         string email, 
         string? phone, 
         string password, 
@@ -26,6 +28,7 @@ public class User: AggregateRoot
         bool? isVerified = false,
         bool isActive = true): base()
     {
+        Username = username;
         Email = email;
         Phone = phone ?? null;
         Password = password;
@@ -38,12 +41,14 @@ public class User: AggregateRoot
     }
     
     public void Update(
+        string? username,
         string? email, 
         string? phone, 
         DateTime birthday, 
         Roles? role, 
         bool? isActive)
     {
+        Username = username ?? Username;
         Email = email ?? Email;
         Phone = phone ?? Phone;
         Birthday = birthday;
@@ -82,6 +87,7 @@ public class User: AggregateRoot
     private void Validate()
     {
         UserValidator.Validate(
+            Username,
             Email, 
             Password
         );

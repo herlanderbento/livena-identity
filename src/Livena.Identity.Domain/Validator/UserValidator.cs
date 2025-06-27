@@ -5,9 +5,14 @@ namespace Livena.Identity.Domain.Validator;
 public static class UserValidator
 {
     public static void Validate(
+        string username,
         string email,
         string password)
     {
+        DomainValidation.NotNullOrEmpty(username, nameof(username));
+        DomainValidation.MinLength(username, 6, nameof(username));
+        DomainValidation.MaxLength(username, 255, nameof(username));
+        
         DomainValidation.NotNullOrEmpty(email, nameof(email));
         DomainValidation.MaxLength(email, 255, nameof(email));
         DomainValidation.Email(email, nameof(email));

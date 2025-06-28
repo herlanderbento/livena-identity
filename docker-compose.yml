@@ -1,4 +1,5 @@
-version: "3.8"
+include:
+  - ./docker-compose.keycloak.yaml
 
 services:
   livena.identity_api:

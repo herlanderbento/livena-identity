@@ -21,6 +21,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Livena.Identity.Application\Livena.Identity.Application.csproj" />
       <ProjectReference Include="..\Livena.Identity.Domain\Livena.Identity.Domain.csproj" />
+      <ProjectReference Include="..\Livena.Identity.infra\Livena.Identity.infra.csproj" />
     </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@ namespace Livena.Identity.Domain.Entity;
 public class User: AggregateRoot
 {
     public string Username { get; private set; }
-    public string Email { get; private set; }
+    public string? Email { get; private set; }
     public string? Phone { get; private set;  }
     public string Password { get; private set; }
     public DateTime Birthday { get; private set; }
@@ -20,7 +20,7 @@ public class User: AggregateRoot
 
     public User(
         string username,
-        string email, 
+        string? email, 
         string? phone, 
         string password, 
         DateTime birthday, 
@@ -29,7 +29,7 @@ public class User: AggregateRoot
         bool isActive = true): base()
     {
         Username = username;
-        Email = email;
+        Email = email ?? null;
         Phone = phone ?? null;
         Password = password;
         Birthday = birthday;
@@ -44,14 +44,14 @@ public class User: AggregateRoot
         string? username,
         string? email, 
         string? phone, 
-        DateTime birthday, 
+        DateTime? birthday, 
         Roles? role, 
         bool? isActive)
     {
         Username = username ?? Username;
         Email = email ?? Email;
         Phone = phone ?? Phone;
-        Birthday = birthday;
+        Birthday = birthday ?? Birthday;
         Role = role ?? Role;
         
         UpdatedAt = DateTime.UtcNow;

@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  livena.keycloak:
+    container_name: livena.keycloak
+    image: quay.io/keycloak/keycloak:21.1.2
+    depends_on:
+      livena.keycloak_db:
+        condition: service_healthy
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: livena.keycloak_db
+      KC_DB_URL_PORT: 5432
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_DB_SCHEMA: public
+    command:
+      - start-dev
+      - --import-realm
+      - --hostname-strict=false
+      - --hostname-strict-https=false
+      - --http-enabled=true
+      - --http-port=8080
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./.docker/keycloak:/opt/keycloak/data/import
+    restart: always
+
+  livena.keycloak_db:
+    container_name: livena.keycloak_db
+    image: postgres:16
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    ports:
+      - "5433:5432"
+    volumes:
+      - keycloak_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+volumes:
+  keycloak_pg_data:

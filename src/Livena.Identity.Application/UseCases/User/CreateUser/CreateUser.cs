@@ -57,6 +57,7 @@ public class CreateUser: ICreateUser
         await _userRepository.Insert(entity, cancellationToken);
         await _unitOfWork.Commit(cancellationToken);
         
+        // Enable Keycloak integration
         await _keycloakService.Insert(new {
             id = entity.Id,
             username = entity.Username,

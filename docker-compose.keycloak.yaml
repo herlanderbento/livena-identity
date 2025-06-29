@@ -29,6 +29,23 @@ services:
       - ./.docker/keycloak:/opt/keycloak/data/import
     restart: always
 
+  livena.keycloak_init:
+    container_name: livena.keycloak_init
+    image: alpine:latest
+    depends_on:
+      livena.keycloak:
+        condition: service_started
+    volumes:
+      - ./docker/keycloak/init-keycloak.sh:/init-keycloak.sh
+    command: >
+      sh -c "
+        apk add --no-cache curl jq &&
+        sleep 30 &&
+        chmod +x /init-keycloak.sh &&
+        /init-keycloak.sh
+      "
+    restart: "no"
+
   livena.keycloak_db:
     container_name: livena.keycloak_db
     image: postgres:16

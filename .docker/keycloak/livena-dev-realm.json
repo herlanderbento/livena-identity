@@ -1,0 +1,69 @@
+{
+  "realm": "livena-dev",
+  "enabled": true,
+  "displayName": "Livena Development",
+  "clients": [
+    {
+      "clientId": "backend-client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "RoeM1m9lHff3M74SO5tIagAw3jfPWzwG",
+      "redirectUris": [],
+      "webOrigins": [],
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true,
+      "attributes": {
+        "saml.assertion.signature": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.encrypt": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "saml_force_name_id_format": "false",
+        "saml.client.signature": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "saml.authnstatement": "false",
+        "display.on.consent.screen": "false",
+        "saml.onetimeuse.condition": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [],
+      "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ],
+      "access": {
+        "view": true,
+        "configure": true,
+        "manage": true
+      }
+    }
+  ],
+  "users": [],
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrator role"
+      },
+      {
+        "name": "user",
+        "description": "Regular user role"
+      }
+    ]
+  },
+  "groups": []
+} 

@@ -6,6 +6,7 @@ builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.Production.json", optional: true, reloadOnChange: true)
     .AddJsonFile("appsettings.Migrations.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
@@ -32,6 +33,8 @@ app.UseCors("CORS");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MigrateDatabase();
 
 app.Run();
 

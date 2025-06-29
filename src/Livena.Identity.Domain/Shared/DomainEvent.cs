@@ -5,6 +5,6 @@ public abstract class DomainEvent
     public DateTime OccuredOn { get; set; }
     protected DomainEvent()
     {
-        OccuredOn = DateTime.Now;
+        OccuredOn = DateTime.UtcNow;
     }
 }

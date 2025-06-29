@@ -37,7 +37,7 @@ public static class ControllersConfiguration
         {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "M27 MetaBlog Api",
+                Title = "Livena Identity Api",
                 Version = "v1"
             });
 
@@ -59,15 +59,12 @@ public static class ControllersConfiguration
 
     public static WebApplication UseDocumentation(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "M27 MetaBlog Api V1");
-                options.RoutePrefix = string.Empty;
-            });
-        }
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Livena Identity Api V1");
+            options.RoutePrefix = string.Empty;
+        });
         return app;
     }
 }

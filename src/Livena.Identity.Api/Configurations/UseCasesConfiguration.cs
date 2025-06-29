@@ -31,7 +31,12 @@ public static class UseCasesConfiguration
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<ICryptography, BCryptHasher>();
         services.AddTransient<IUnitOfWork, UnitOfWork>();
-        services.AddHttpClient<IKeycloakService, KeycloakService>();
+        services.AddHttpClient<IKeycloakService, KeycloakService>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var baseUrl = configuration["Keycloak:BaseUrl"];
+            client.BaseAddress = new Uri(baseUrl!);
+        });
         
         return services;
     }

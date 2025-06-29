@@ -1,5 +1,6 @@
 ﻿using Livena.Identity.infra.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Livena.Identity.Api.Configurations;
 
@@ -20,10 +21,16 @@ public static class ConnectionsConfiguration
     )
     {
         var connectionString = configuration
-            .GetConnectionString("MetaBlogDb");
+            .GetConnectionString("IdentityDb");
+        
+        // Configure Npgsql to handle DateTime properly
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", false);
+        AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+        
         services.AddDbContext<LivenaIdentityDbContext>(
             options => options.UseNpgsql(
-                connectionString)
+                connectionString
+            )
         );
         return services;
     }

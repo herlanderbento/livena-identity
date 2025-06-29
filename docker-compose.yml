@@ -12,6 +12,7 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__IdentityDb=Host=livena.identity_db;Port=5432;Database=livena.identity_db;Username=livena.identity_user;Password=livena.identity_password
     ports:
       - "8080:80"
@@ -19,7 +20,7 @@ services:
 
   livena.identity_db:
     image: postgres:16
-    container_name: identity_db
+    container_name: livena.identity_db
     hostname: localhost
     environment:
       POSTGRES_DB: livena.identity_db

@@ -26,19 +26,7 @@ public class OAuthAccount: AggregateRoot
         ProviderUserId = providerUserId;
         AccessToken = accessToken;
         RefreshToken = refreshToken;
-        ExpiresAt = EnsureUtc(expiresAt);
+        ExpiresAt = DateTimeUtils.EnsureUtc(expiresAt);
         CreatedAt = DateTime.UtcNow;
-    }
-    
-    private static DateTime EnsureUtc(DateTime dateTime)
-    {
-        if (dateTime.Kind == DateTimeKind.Utc)
-            return dateTime;
-        
-        if (dateTime.Kind == DateTimeKind.Local)
-            return dateTime.ToUniversalTime();
-        
-        // If Kind is Unspecified, assume it's UTC
-        return DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
     }
 }

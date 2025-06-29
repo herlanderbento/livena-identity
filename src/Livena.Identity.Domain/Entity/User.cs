@@ -17,7 +17,6 @@ public class User: AggregateRoot
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-
     public User(
         string username,
         string? email, 
@@ -32,24 +31,14 @@ public class User: AggregateRoot
         Email = email ?? null;
         Phone = phone ?? null;
         Password = password;
-        Birthday = EnsureUtc(birthday);
+        Birthday = DateTimeUtils.EnsureUtc(birthday);
         Role = role;
         IsVerified = isVerified;
         IsActive = isActive;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
-    }
-    
-    private static DateTime EnsureUtc(DateTime dateTime)
-    {
-        if (dateTime.Kind == DateTimeKind.Utc)
-            return dateTime;
-        
-        if (dateTime.Kind == DateTimeKind.Local)
-            return dateTime.ToUniversalTime();
-        
-        // If Kind is Unspecified, assume it's UTC
-        return DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+
+        Validate();
     }
     
     public void Update(
@@ -63,8 +52,9 @@ public class User: AggregateRoot
         Username = username ?? Username;
         Email = email ?? Email;
         Phone = phone ?? Phone;
-        Birthday = birthday.HasValue ? EnsureUtc(birthday.Value) : Birthday;
+        Birthday = birthday.HasValue ? DateTimeUtils.EnsureUtc(birthday.Value) : Birthday;
         Role = role ?? Role;
+        IsActive = isActive ?? IsActive;
         
         UpdatedAt = DateTime.UtcNow;
         

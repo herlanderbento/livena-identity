@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Livena.Identity.Application.Interfaces;
+using Livena.Identity.Domain.Entity;
 
 namespace Livena.Identity.infra.Keycloak;
 
@@ -28,18 +29,41 @@ public class KeycloakService : IKeycloakService
         _tokenUrl = _configuration["Keycloak:TokenUrl"]!;
     }
 
-    public async Task Insert(object input, CancellationToken cancellationToken)
+    public async Task Insert(User user, string password, CancellationToken cancellationToken)
     {
+        var keycloakUser = (new
+        {
+            id = user.Id,
+            username = user.Username,
+            email = user.Email ?? $"{user.Username}@placeholder.livena",
+            enabled = true,
+            emailVerified = user.IsVerified ?? false,
+            attributes = new
+            {
+                phone = user.Phone,
+                birthday = user.Birthday.ToString("yyyy-MM-dd")
+            },
+            credentials = new[]
+            {
+                new
+                {
+                    type = "password",
+                    value = password,
+                    temporary = false
+                }
+            }
+        });
+        
         var request = new HttpRequestMessage(HttpMethod.Post, $"/admin/realms/{_realm}/users")
         {
-            Content = CreateJsonContent(input)
+            Content = CreateJsonContent(keycloakUser)
         };
 
         await AddAuthorizationAsync(request, cancellationToken);
         var response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
-
+    
     public async Task Update(string keycloakUserId, object input, CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"/admin/realms/{_realm}/users/{keycloakUserId}")

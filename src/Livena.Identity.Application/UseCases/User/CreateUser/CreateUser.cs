@@ -56,25 +56,6 @@ public class CreateUser: ICreateUser
         
         await _userRepository.Insert(entity, cancellationToken);
         await _unitOfWork.Commit(cancellationToken);
-        
-        // Enable Keycloak integration
-        await _keycloakService.Insert(new {
-            id = entity.Id,
-            username = entity.Username,
-            email = entity.Email ?? $"{entity.Username}@placeholder.livena",
-            enabled = true,
-            emailVerified = entity.IsVerified ?? false,
-            attributes = new {
-                phone = entity.Phone,
-                birthday = entity.Birthday.ToString("yyyy-MM-dd")
-            },
-            credentials = new[] {
-                new {
-                    type = "password",
-                    value = input.Password,
-                    temporary = false
-                }
-            }
-        }, cancellationToken);
+        await _keycloakService.Insert(entity, input.Password, cancellationToken);
     }
 }

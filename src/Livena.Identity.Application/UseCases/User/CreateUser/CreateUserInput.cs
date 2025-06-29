@@ -39,7 +39,8 @@ public class CreateUserInputValidator : AbstractValidator<CreateUserInput>
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(6).WithMessage("Password must be at least 6 characters long.");
+            .MinimumLength(6).WithMessage("Password must be at least 6 characters long.")
+            .MaximumLength(20).WithMessage("Password must not exceed 20 characters.");
         
         RuleFor(x => x.Birthday)
             .NotEmpty().WithMessage("Birthday is required.")

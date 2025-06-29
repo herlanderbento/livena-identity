@@ -1,4 +1,6 @@
-﻿namespace Livena.Identity.Application.Interfaces;
+﻿using Livena.Identity.Domain.Entity;
+
+namespace Livena.Identity.Application.Interfaces;
 
 public class KeycloakTokenResponse
 {
@@ -9,7 +11,7 @@ public class KeycloakTokenResponse
 
 public interface IKeycloakService
 {
-    Task Insert(object input, CancellationToken cancellationToken);
+    Task Insert(User user, string password, CancellationToken cancellationToken);
     Task Delete(string keycloakUserId, CancellationToken cancellationToken);
     Task Update(string keycloakUserId, object input, CancellationToken cancellationToken);
 }

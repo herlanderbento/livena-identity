@@ -60,7 +60,6 @@ public class UserRepository(LivenaIdentityDbContext context) : IUserRepository
         return models;
     }
 
-    
     public async Task<SearchOutput<User>> Search(SearchInput<string> input, CancellationToken cancellationToken)
     {
         var toSkip = (input.Page - 1) * input.PerPage;

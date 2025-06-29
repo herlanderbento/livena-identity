@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
+using Livena.Identity.Application.UseCases.User.Common;
 using Livena.Identity.Domain.Enum;
 using MediatR;
 
 namespace Livena.Identity.Application.UseCases.User.CreateUser;
 
-public class CreateUserInput: IRequest
+public class CreateUserInput: IRequest<UserOutput>
 {
     public string Username { get; set; }
     public string? Email { get; private set; }

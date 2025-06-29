@@ -9,14 +9,14 @@ using MediatR;
 namespace Livena.Identity.Api.Controllers;
 
 [ApiController]
-[Route("/api/users")]
+[Route("/api/v1/users")]
 public class UsersController(IMediator mediator, RequestValidator requestValidator) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
     private readonly RequestValidator _requestValidator = requestValidator;
     
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiPresenter<UserOutput>), StatusCodes.Status201Created)]    
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> Create(
@@ -25,8 +25,8 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     )
     {
         _requestValidator.Validate(request, cancellationToken);
-        await _mediator.Send(request, cancellationToken);
-        return Created();
+        var output = await _mediator.Send(request, cancellationToken);
+        return CreatedAtAction(nameof(Create), new { output.Id }, new ApiPresenter<UserOutput>(output));
     }
 
 }

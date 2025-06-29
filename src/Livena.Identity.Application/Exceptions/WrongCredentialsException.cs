@@ -12,4 +12,12 @@ public class WrongCredentialsException : ApplicationException
         if (@object == null)
             throw new WrongCredentialsException(exceptionMessage);
     }
+    
+    public static void ThrowIfFalse(
+        bool condition, 
+        string exceptionMessage)
+    {
+        if (!condition)
+            throw new WrongCredentialsException(exceptionMessage);
+    }
 }

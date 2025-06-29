@@ -1,5 +1,6 @@
 ﻿using Livena.Identity.Application.Exceptions;
 using Livena.Identity.Application.Interfaces;
+using Livena.Identity.Application.UseCases.User.Common;
 using Livena.Identity.Domain.Repository;
 
 using DomainEntity = Livena.Identity.Domain.Entity;
@@ -26,7 +27,7 @@ public class CreateUser: ICreateUser
         _keycloakService = keycloakService;
     }
     
-    public async Task Handle(CreateUserInput input, CancellationToken cancellationToken)
+    public async Task<UserOutput> Handle(CreateUserInput input, CancellationToken cancellationToken)
     {
         var userWithUsername = await _userRepository.GetByUsername(input.Username, cancellationToken);
         
@@ -57,5 +58,7 @@ public class CreateUser: ICreateUser
         await _userRepository.Insert(entity, cancellationToken);
         await _unitOfWork.Commit(cancellationToken);
         await _keycloakService.Insert(entity, input.Password, cancellationToken);
+        
+        return UserOutput.FromUser(entity);
     }
 }

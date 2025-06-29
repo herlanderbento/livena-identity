@@ -96,7 +96,12 @@ public class KeycloakService : IKeycloakService
         });
 
         var response = await _httpClient.PostAsync(_tokenUrl, content, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException($"Keycloak authentication failed with status {response.StatusCode}. Response: {errorContent}");
+        }
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         var data = JsonSerializer.Deserialize<JsonElement>(json);
@@ -140,7 +145,12 @@ public class KeycloakService : IKeycloakService
         });
 
         var response = await _httpClient.PostAsync(_tokenUrl, content, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException($"Failed to get admin token from Keycloak. Status: {response.StatusCode}. Response: {errorContent}");
+        }
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         var data = JsonSerializer.Deserialize<JsonElement>(json);

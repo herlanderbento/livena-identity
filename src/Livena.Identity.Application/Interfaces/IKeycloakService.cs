@@ -14,4 +14,6 @@ public interface IKeycloakService
     Task Insert(User user, string password, CancellationToken cancellationToken);
     Task Delete(string keycloakUserId, CancellationToken cancellationToken);
     Task Update(string keycloakUserId, object input, CancellationToken cancellationToken);
+    
+    Task<KeycloakTokenResponse> Login(string username, string password,CancellationToken cancellationToken);
 }

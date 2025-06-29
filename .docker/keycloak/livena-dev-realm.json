@@ -13,6 +13,10 @@
       "publicClient": false,
       "protocol": "openid-connect",
       "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
       "attributes": {
         "saml.assertion.signature": "false",
         "saml.force.post.binding": "false",

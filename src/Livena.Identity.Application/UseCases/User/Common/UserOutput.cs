@@ -9,7 +9,6 @@ public record UserOutput
     public string? Email { get; private set; }
     public string? Phone { get; private set;  }
     public DateTime Birthday { get; private set; }
-    public Roles Role { get; private set; }
     public bool? IsVerified { get; private set; }
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -21,7 +20,6 @@ public record UserOutput
         string? email, 
         string? phone, 
         DateTime birthday, 
-        Roles role, 
         bool? isVerified, 
         bool isActive, 
         DateTime createdAt, 
@@ -33,7 +31,6 @@ public record UserOutput
         Email = email;
         Phone = phone;
         Birthday = birthday;
-        Role = role;
         IsVerified = isVerified;
         IsActive = isActive;
         CreatedAt = createdAt;
@@ -47,10 +44,11 @@ public record UserOutput
             user.Email,
             user.Phone,
             user.Birthday,
-            user.Role,
             user.IsVerified,
             user.IsActive,
             user.CreatedAt,
             user.UpdatedAt
         );
+    
+    
 }

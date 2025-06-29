@@ -38,6 +38,13 @@ public class ApiGlobalExceptionFilter : IExceptionFilter
             details.Type = "Conflict";
             details.Detail = exception!.Message;
         }
+        else if (exception is WrongCredentialsException)
+        {
+            details.Title = "Wrong Credentials";
+            details.Status = StatusCodes.Status401Unauthorized;
+            details.Type = "WrongCredentials";
+            details.Detail = exception!.Message;
+        }
         else
         {
             details.Title = "An unexpected error ocurred";

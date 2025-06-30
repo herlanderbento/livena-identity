@@ -42,18 +42,14 @@ public class User: AggregateRoot
     }
     
     public void Update(
-        string? username,
         string? email, 
         string? phone, 
         DateTime? birthday, 
-        Roles? role, 
         bool? isActive)
     {
-        Username = username ?? Username;
         Email = email ?? Email;
         Phone = phone ?? Phone;
         Birthday = birthday.HasValue ? DateTimeUtils.EnsureUtc(birthday.Value) : Birthday;
-        Role = role ?? Role;
         IsActive = isActive ?? IsActive;
         
         UpdatedAt = DateTime.UtcNow;

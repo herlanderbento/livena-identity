@@ -2,7 +2,4 @@
 using MediatR;
 namespace Livena.Identity.Application.UseCases.User.CreateUser;
 
-public interface ICreateUser: IRequestHandler<CreateUserInput, UserOutput>
-{
-    
-}
+public interface ICreateUser: IRequestHandler<CreateUserInput, UserOutput>;

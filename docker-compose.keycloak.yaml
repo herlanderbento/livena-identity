@@ -3,7 +3,7 @@ version: "3.8"
 services:
   livena.keycloak:
     container_name: livena.keycloak
-    image: quay.io/keycloak/keycloak:21.1.2
+    image: quay.io/keycloak/keycloak:26.2.5
     depends_on:
       livena.keycloak_db:
         condition: service_healthy
@@ -19,9 +19,6 @@ services:
     command:
       - start-dev
       - --import-realm
-      - --hostname-strict=false
-      - --hostname-strict-https=false
-      - --http-enabled=true
       - --http-port=8080
     ports:
       - "8081:8080"

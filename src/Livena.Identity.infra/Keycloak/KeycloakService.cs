@@ -33,7 +33,6 @@ public class KeycloakService : IKeycloakService
     {
         var keycloakUser = (new
         {
-            id = user.Id,
             username = user.Username,
             email = user.Email ?? $"{user.Username}@placeholder.livena",
             enabled = true,
@@ -41,7 +40,8 @@ public class KeycloakService : IKeycloakService
             attributes = new
             {
                 phone = user.Phone,
-                birthday = user.Birthday.ToString("yyyy-MM-dd")
+                birthday = user.Birthday.ToString("yyyy-MM-dd"),
+                externalId = user.Id.ToString()
             },
             credentials = new[]
             {
@@ -61,19 +61,59 @@ public class KeycloakService : IKeycloakService
 
         await AddAuthorizationAsync(request, cancellationToken);
         var response = await _httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
-    }
-    
-    public async Task Update(string keycloakUserId, object input, CancellationToken cancellationToken)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"/admin/realms/{_realm}/users/{keycloakUserId}")
+        
+        if (!response.IsSuccessStatusCode)
         {
-            Content = CreateJsonContent(input)
-        };
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException($"Failed to create user in Keycloak. Status: {response.StatusCode}. Response: {errorContent}");
+        }
+    }
 
+    public async Task<string?> GetKeycloakIdByExternalId(string externalId, CancellationToken cancellationToken)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/admin/realms/{_realm}/users?exact=true&first=0&max=1&q=externalId:{externalId}");
         await AddAuthorizationAsync(request, cancellationToken);
         var response = await _httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        var users = JsonSerializer.Deserialize<JsonElement>(json);
+
+        if (users.ValueKind == JsonValueKind.Array && users.GetArrayLength() > 0)
+        {
+            return users[0].GetProperty("id").GetString();
+        }
+        return null;
+    }
+
+    public async Task Update(User user, CancellationToken cancellationToken)
+    {
+        var keycloakUserId = await GetKeycloakIdByExternalId(user.Id.ToString(), cancellationToken);
+        if (keycloakUserId != null)
+        {
+            var keycloakUpdate = new
+            {
+                email = user.Email ?? $"{user.Username}@placeholder.livena",
+                emailVerified = user.IsVerified ?? false,
+                attributes = new
+                {
+                    phone = user.Phone,
+                    birthday = user.Birthday.ToString("yyyy-MM-dd"),
+                    externalId = user.Id.ToString()
+                }
+            };
+            
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/admin/realms/{_realm}/users/{keycloakUserId}")
+            {
+                Content = CreateJsonContent(keycloakUpdate)
+            };
+
+            await AddAuthorizationAsync(request, cancellationToken);
+            var response = await _httpClient.SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
+        }
     }
 
     public async Task Delete(string keycloakUserId, CancellationToken cancellationToken)
@@ -82,6 +122,22 @@ public class KeycloakService : IKeycloakService
         await AddAuthorizationAsync(request, cancellationToken);
         var response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<object?> GetById(string keycloakUserId, CancellationToken cancellationToken)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/admin/realms/{_realm}/users/{keycloakUserId}");
+        await AddAuthorizationAsync(request, cancellationToken);
+        var response = await _httpClient.SendAsync(request, cancellationToken);
+        
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+        
+        response.EnsureSuccessStatusCode();
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        return JsonSerializer.Deserialize<JsonElement>(json);
     }
 
     public async Task<KeycloakTokenResponse> Login(string username, string password, CancellationToken cancellationToken)

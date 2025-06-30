@@ -13,7 +13,8 @@ public interface IKeycloakService
 {
     Task Insert(User user, string password, CancellationToken cancellationToken);
     Task Delete(string keycloakUserId, CancellationToken cancellationToken);
-    Task Update(string keycloakUserId, object input, CancellationToken cancellationToken);
-    
+    Task Update(User user, CancellationToken cancellationToken);
+    Task<object?> GetById(string keycloakUserId, CancellationToken cancellationToken);
     Task<KeycloakTokenResponse> Login(string username, string password,CancellationToken cancellationToken);
+    Task<string?> GetKeycloakIdByExternalId(string externalId, CancellationToken cancellationToken);
 }

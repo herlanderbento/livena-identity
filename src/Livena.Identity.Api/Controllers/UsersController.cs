@@ -1,7 +1,13 @@
-﻿using Livena.Identity.Api.Presenters;
+﻿using Livena.Identity.Api.ApiModels.User;
+using Livena.Identity.Api.Presenters;
 using Livena.Identity.Api.Validators;
 using Livena.Identity.Application.UseCases.User.Common;
 using Livena.Identity.Application.UseCases.User.CreateUser;
+using Livena.Identity.Application.UseCases.User.UpdateUser;
+using Livena.Identity.Application.UseCases.User.DeleteUser;
+using Livena.Identity.Application.UseCases.User.GetUser;
+using Livena.Identity.Application.UseCases.User.ListUsers;
+using Livena.Identity.Domain.Shared.SearchableRepository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using MediatR;
@@ -28,5 +34,78 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
         var output = await _mediator.Send(request, cancellationToken);
         return CreatedAtAction(nameof(Create), new { output.Id }, new ApiPresenter<UserOutput>(output));
     }
+    
+    [HttpGet]
+    [ProducesResponseType(typeof(ListUsersOutput), StatusCodes.Status200OK)]
+    public async Task<IActionResult> List(
+        CancellationToken cancellationToken,        
+        [FromQuery] int? page = null,
+        [FromQuery(Name = "per_page")] int? perPage = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? sort = null,
+        [FromQuery] SearchOrder? dir = null
+    )
+    {
+        var input = new ListUsersInput();
+        if (page is not null) input.Page = page.Value;
+        if (perPage is not null) input.PerPage = perPage.Value;
+        if (!String.IsNullOrWhiteSpace(search)) input.Search = search;
+        if (!String.IsNullOrWhiteSpace(sort)) input.Sort = sort;
+        if (dir is not null) input.Dir = dir.Value;
+        
+        var output = await _mediator.Send(input, cancellationToken);
+        return Ok(
+            new ApiPresenterList<UserOutput>(output)
+        );
+    }
+    
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(ApiPresenter<UserOutput>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken
+    )
+    {
+        var output = await _mediator.Send(new GetUserInput(id), cancellationToken);
+        return Ok(new ApiPresenter<UserOutput>(output));
+    }
 
+    [HttpPatch("{id:guid}")]
+    [ProducesResponseType(typeof(ApiPresenter<UserOutput>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> Update(
+        [FromRoute] Guid id,
+        [FromBody] UpdateUserApiInput request,
+        CancellationToken cancellationToken
+    )
+    {
+        var input = new UpdateUserInput(
+            id,
+            request.Email,
+            request.Phone,
+            request.Birthday,
+            request.IsActive
+        );
+        
+        _requestValidator.Validate(input, cancellationToken);
+        var output = await _mediator.Send(input, cancellationToken);
+        return Ok(new ApiPresenter<UserOutput>(output));
+    }
+
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(
+        Guid id,
+        CancellationToken cancellationToken
+    )
+    {
+        var request = new DeleteUserInput(id);
+        _requestValidator.Validate(request, cancellationToken);
+        await _mediator.Send(request, cancellationToken);
+        return NoContent();
+    }
 }

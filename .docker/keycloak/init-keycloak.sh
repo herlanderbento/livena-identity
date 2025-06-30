@@ -61,6 +61,19 @@ fi
 
 echo "Manage-users role ID: $MANAGE_USERS_ROLE_ID"
 
+# Get view-users role ID
+echo "Getting view-users role ID..."
+VIEW_USERS_ROLE_ID=$(curl -s -X GET "http://localhost:8081/admin/realms/livena-dev/clients/$REALM_MANAGEMENT_ID/roles" \
+    -H "Authorization: Bearer $ADMIN_TOKEN" \
+    -H "Content-Type: application/json" | jq -r '.[] | select(.name == "view-users") | .id')
+
+if [ "$VIEW_USERS_ROLE_ID" = "null" ] || [ -z "$VIEW_USERS_ROLE_ID" ]; then
+    echo "Failed to get view-users role ID"
+    exit 1
+fi
+
+echo "View-users role ID: $VIEW_USERS_ROLE_ID"
+
 # Get service account user ID
 echo "Getting service account user ID..."
 SERVICE_ACCOUNT_ID=$(curl -s -X GET "http://localhost:8081/admin/realms/livena-dev/clients/$BACKEND_CLIENT_ID/service-account-user" \
@@ -74,17 +87,17 @@ fi
 
 echo "Service account user ID: $SERVICE_ACCOUNT_ID"
 
-# Assign manage-users role to service account
-echo "Assigning manage-users role to service account..."
+# Assign manage-users and view-users roles to service account
+echo "Assigning manage-users and view-users roles to service account..."
 curl -s -X POST "http://localhost:8081/admin/realms/livena-dev/users/$SERVICE_ACCOUNT_ID/role-mappings/clients/$REALM_MANAGEMENT_ID" \
     -H "Authorization: Bearer $ADMIN_TOKEN" \
     -H "Content-Type: application/json" \
-    -d "[{\"id\": \"$MANAGE_USERS_ROLE_ID\", \"name\": \"manage-users\"}]"
+    -d "[{\"id\": \"$MANAGE_USERS_ROLE_ID\", \"name\": \"manage-users\"}, {\"id\": \"$VIEW_USERS_ROLE_ID\", \"name\": \"view-users\"}]"
 
 if [ $? -eq 0 ]; then
-    echo "Successfully assigned manage-users role to service account"
+    echo "Successfully assigned manage-users and view-users roles to service account"
 else
-    echo "Failed to assign manage-users role to service account"
+    echo "Failed to assign roles to service account"
     exit 1
 fi
 

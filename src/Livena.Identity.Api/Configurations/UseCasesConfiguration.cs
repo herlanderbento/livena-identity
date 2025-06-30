@@ -2,6 +2,8 @@
 using Livena.Identity.Application.Events;
 using Livena.Identity.Application.Interfaces;
 using Livena.Identity.Application.UseCases.User.CreateUser;
+using Livena.Identity.Api.ApiModels.User;
+using Livena.Identity.Application.UseCases.User.UpdateUser;
 using Livena.Identity.Domain.Repository;
 using Livena.Identity.Domain.Shared;
 using Livena.Identity.infra.Cryptography;
@@ -46,6 +48,7 @@ public static class UseCasesConfiguration
     )
     {
         services.AddValidatorsFromAssemblyContaining<CreateUserInputValidator>();
+        services.AddValidatorsFromAssemblyContaining<UpdateUserInputValidator>();
         return services;
     }
     

@@ -1,18 +1,16 @@
-﻿using Livena.Identity.Domain.Enum;
-
-namespace Livena.Identity.Application.UseCases.User.Common;
+﻿namespace Livena.Identity.Application.UseCases.User.Common;
 
 public record UserOutput
 {
     public Guid Id { get; set; }
     public string Username { get; set; }
-    public string? Email { get; private set; }
-    public string? Phone { get; private set;  }
-    public DateTime Birthday { get; private set; }
-    public bool? IsVerified { get; private set; }
-    public bool IsActive { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
+    public string? Email { get; set; }
+    public string? Phone { get; set; }
+    public DateTime Birthday { get; set; }
+    public bool? IsVerified { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 
     public UserOutput(
         Guid id, 
@@ -48,7 +46,6 @@ public record UserOutput
             user.IsActive,
             user.CreatedAt,
             user.UpdatedAt
-        );
-    
+        );    
     
 }

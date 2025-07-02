@@ -13,6 +13,7 @@ builder.Configuration
 builder.Services
     .AddAppConections(builder.Configuration)
     .AddUseCases()
+    .AddSecurity(builder.Configuration)
     .AddAndConfigureControllers()
     .AddHttpLogging(logging =>
     {
@@ -20,9 +21,9 @@ builder.Services
         logging.RequestBodyLogLimit = 4096;
         logging.ResponseBodyLogLimit = 4096;
     })
-    .AddCors(p => p.AddPolicy("CORS", builder =>
+    .AddCors(p => p.AddPolicy("CORS", corsPolicyBuilder =>
     {
-        builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+        corsPolicyBuilder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
     }));
 
 var app = builder.Build();
@@ -33,9 +34,7 @@ app.UseCors("CORS");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.MigrateDatabase();
-
 app.Run();
 
 public partial class Program { }

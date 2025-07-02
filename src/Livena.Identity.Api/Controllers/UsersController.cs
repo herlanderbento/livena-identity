@@ -1,4 +1,5 @@
 ﻿using Livena.Identity.Api.ApiModels.User;
+using Livena.Identity.Api.Authorization;
 using Livena.Identity.Api.Presenters;
 using Livena.Identity.Api.Validators;
 using Livena.Identity.Application.UseCases.User.Common;
@@ -20,9 +21,9 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
 {
     private readonly IMediator _mediator = mediator;
     private readonly RequestValidator _requestValidator = requestValidator;
-    
+
     [HttpPost]
-    [ProducesResponseType(typeof(ApiPresenter<UserOutput>), StatusCodes.Status201Created)]    
+    [ProducesResponseType(typeof(ApiPresenter<UserOutput>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> Create(
@@ -34,11 +35,12 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
         var output = await _mediator.Send(request, cancellationToken);
         return CreatedAtAction(nameof(Create), new { output.Id }, new ApiPresenter<UserOutput>(output));
     }
-    
+
     [HttpGet]
+    [Authorize(Roles = $"{Roles.Admin}")]
     [ProducesResponseType(typeof(ListUsersOutput), StatusCodes.Status200OK)]
     public async Task<IActionResult> List(
-        CancellationToken cancellationToken,        
+        CancellationToken cancellationToken,
         [FromQuery] int? page = null,
         [FromQuery(Name = "per_page")] int? perPage = null,
         [FromQuery] string? search = null,
@@ -52,13 +54,13 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
         if (!String.IsNullOrWhiteSpace(search)) input.Search = search;
         if (!String.IsNullOrWhiteSpace(sort)) input.Sort = sort;
         if (dir is not null) input.Dir = dir.Value;
-        
+
         var output = await _mediator.Send(input, cancellationToken);
         return Ok(
             new ApiPresenterList<UserOutput>(output)
         );
     }
-    
+
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ApiPresenter<UserOutput>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -89,7 +91,7 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
             request.Birthday,
             request.IsActive
         );
-        
+
         _requestValidator.Validate(input, cancellationToken);
         var output = await _mediator.Send(input, cancellationToken);
         return Ok(new ApiPresenter<UserOutput>(output));

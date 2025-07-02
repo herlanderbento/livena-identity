@@ -67,6 +67,55 @@ public class KeycloakService : IKeycloakService
             var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
             throw new HttpRequestException($"Failed to create user in Keycloak. Status: {response.StatusCode}. Response: {errorContent}");
         }
+
+        // Wait a moment for the user to be fully created
+        await Task.Delay(2000, cancellationToken);
+        
+        // Find the user by externalId and assign role
+        var keycloakUserId = await GetKeycloakIdByExternalId(user.Id.ToString(), cancellationToken);
+        if (!string.IsNullOrEmpty(keycloakUserId))
+        {
+            await AssignUserRole(keycloakUserId, cancellationToken);
+        }
+    }
+
+    private async Task AssignUserRole(string keycloakUserId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Get the user role ID
+            var roleRequest = new HttpRequestMessage(HttpMethod.Get, $"/admin/realms/{_realm}/roles/user");
+            await AddAuthorizationAsync(roleRequest, cancellationToken);
+            var roleResponse = await _httpClient.SendAsync(roleRequest, cancellationToken);
+            
+            if (roleResponse.IsSuccessStatusCode)
+            {
+                var roleJson = await roleResponse.Content.ReadAsStringAsync(cancellationToken);
+                var role = JsonSerializer.Deserialize<JsonElement>(roleJson);
+                var roleId = role.GetProperty("id").GetString();
+
+                // Assign the role to the user
+                var assignRoleRequest = new HttpRequestMessage(HttpMethod.Post, $"/admin/realms/{_realm}/users/{keycloakUserId}/role-mappings/realm")
+                {
+                    Content = CreateJsonContent(new[] { new { id = roleId, name = "user" } })
+                };
+                
+                await AddAuthorizationAsync(assignRoleRequest, cancellationToken);
+                var assignResponse = await _httpClient.SendAsync(assignRoleRequest, cancellationToken);
+                
+                if (!assignResponse.IsSuccessStatusCode)
+                {
+                    var errorContent = await assignResponse.Content.ReadAsStringAsync(cancellationToken);
+                    // Don't throw exception, just log the error
+                    Console.WriteLine($"Warning: Failed to assign user role. Status: {assignResponse.StatusCode}. Response: {errorContent}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Don't throw exception, just log the error
+            Console.WriteLine($"Warning: Error assigning user role: {ex.Message}");
+        }
     }
 
     public async Task<string?> GetKeycloakIdByExternalId(string externalId, CancellationToken cancellationToken)

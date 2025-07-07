@@ -19,35 +19,30 @@ public class ApiGlobalExceptionFilter : IExceptionFilter
 
         if(exception is EntityValidationException entityValidationException)
         {
-            details.Title = "One or more validation errors ocurred";
             details.Status = StatusCodes.Status422UnprocessableEntity;
             details.Type = "UnprocessableEntity";
             details.Extensions["errors"] = entityValidationException.Message.Split(" | ");
         }
         else if (exception is NotFoundException)
         {
-            details.Title = "Not Found";
             details.Status = StatusCodes.Status404NotFound;
             details.Type = "NotFound";
             details.Detail = exception!.Message;
         }
         else if (exception is ConflictException)
         {
-            details.Title = "Conflict";
             details.Status = StatusCodes.Status409Conflict;
             details.Type = "Conflict";
             details.Detail = exception!.Message;
         }
         else if (exception is WrongCredentialsException)
         {
-            details.Title = "Wrong Credentials";
             details.Status = StatusCodes.Status401Unauthorized;
             details.Type = "WrongCredentials";
             details.Detail = exception!.Message;
         }
         else
         {
-            details.Title = "An unexpected error ocurred";
             details.Status = StatusCodes.Status422UnprocessableEntity;
             details.Type = "UnexpectedError";
             details.Detail = exception.Message;

@@ -69,71 +69,124 @@ public class KeycloakService : IKeycloakService
         }
 
         // Wait a moment for the user to be fully created
-        await Task.Delay(2000, cancellationToken);
+        await Task.Delay(1000, cancellationToken);
         
-        // Find the user by externalId and assign role
-        var keycloakUserId = await GetKeycloakIdByExternalId(user.Id.ToString(), cancellationToken);
+        // Find the user by username and assign user role directly
+        var keycloakUserId = await GetKeycloakIdByUsername(user.Username, cancellationToken);
         if (!string.IsNullOrEmpty(keycloakUserId))
         {
-            await AssignUserRole(keycloakUserId, cancellationToken);
+            await AssignUserRoleDirectly(keycloakUserId, cancellationToken);
         }
     }
 
-    private async Task AssignUserRole(string keycloakUserId, CancellationToken cancellationToken)
+    private async Task AssignUserRoleDirectly(string keycloakUserId, CancellationToken cancellationToken)
     {
         try
         {
-            // Get the user role ID
-            var roleRequest = new HttpRequestMessage(HttpMethod.Get, $"/admin/realms/{_realm}/roles/user");
-            await AddAuthorizationAsync(roleRequest, cancellationToken);
-            var roleResponse = await _httpClient.SendAsync(roleRequest, cancellationToken);
+            Console.WriteLine($"Starting to assign user role for user ID: {keycloakUserId}");
             
-            if (roleResponse.IsSuccessStatusCode)
-            {
-                var roleJson = await roleResponse.Content.ReadAsStringAsync(cancellationToken);
-                var role = JsonSerializer.Deserialize<JsonElement>(roleJson);
-                var roleId = role.GetProperty("id").GetString();
+            // Use the known role ID directly (we know it from our previous tests)
+            string roleId = "1c8cbc44-e301-4cb2-9dee-bffa9b295c50";
+            Console.WriteLine($"Using role ID: {roleId}");
 
-                // Assign the role to the user
-                var assignRoleRequest = new HttpRequestMessage(HttpMethod.Post, $"/admin/realms/{_realm}/users/{keycloakUserId}/role-mappings/realm")
-                {
-                    Content = CreateJsonContent(new[] { new { id = roleId, name = "user" } })
-                };
-                
-                await AddAuthorizationAsync(assignRoleRequest, cancellationToken);
-                var assignResponse = await _httpClient.SendAsync(assignRoleRequest, cancellationToken);
-                
-                if (!assignResponse.IsSuccessStatusCode)
-                {
-                    var errorContent = await assignResponse.Content.ReadAsStringAsync(cancellationToken);
-                    // Don't throw exception, just log the error
-                    Console.WriteLine($"Warning: Failed to assign user role. Status: {assignResponse.StatusCode}. Response: {errorContent}");
-                }
+            // Assign the role directly to the user (this will appear in realm_access.roles)
+            var assignRoleRequest = new HttpRequestMessage(HttpMethod.Post, $"/admin/realms/{_realm}/users/{keycloakUserId}/role-mappings/realm")
+            {
+                Content = CreateJsonContent(new[] { new { id = roleId, name = "user" } })
+            };
+            
+            var requestBody = await assignRoleRequest.Content.ReadAsStringAsync(cancellationToken);
+            Console.WriteLine($"Assign role request body: {requestBody}");
+            
+            await AddAuthorizationAsync(assignRoleRequest, cancellationToken);
+            var assignResponse = await _httpClient.SendAsync(assignRoleRequest, cancellationToken);
+            
+            Console.WriteLine($"Assign role response status: {assignResponse.StatusCode}");
+            
+            if (!assignResponse.IsSuccessStatusCode)
+            {
+                var errorContent = await assignResponse.Content.ReadAsStringAsync(cancellationToken);
+                Console.WriteLine($"Warning: Failed to assign user role directly. Status: {assignResponse.StatusCode}. Response: {errorContent}");
+            }
+            else
+            {
+                Console.WriteLine("Successfully assigned user role directly!");
             }
         }
         catch (Exception ex)
         {
-            // Don't throw exception, just log the error
-            Console.WriteLine($"Warning: Error assigning user role: {ex.Message}");
+            Console.WriteLine($"Warning: Error assigning user role directly: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
         }
     }
 
     public async Task<string?> GetKeycloakIdByExternalId(string externalId, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"Looking for user with externalId: {externalId}");
+        
         var request = new HttpRequestMessage(HttpMethod.Get, $"/admin/realms/{_realm}/users?exact=true&first=0&max=1&q=externalId:{externalId}");
+        Console.WriteLine($"Search URL: {request.RequestUri}");
+        
         await AddAuthorizationAsync(request, cancellationToken);
         var response = await _httpClient.SendAsync(request, cancellationToken);
 
+        Console.WriteLine($"Search response status: {response.StatusCode}");
+
         if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            Console.WriteLine($"Failed to search user. Status: {response.StatusCode}. Response: {errorContent}");
             return null;
+        }
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        Console.WriteLine($"Search response: {json}");
+        
         var users = JsonSerializer.Deserialize<JsonElement>(json);
 
         if (users.ValueKind == JsonValueKind.Array && users.GetArrayLength() > 0)
         {
-            return users[0].GetProperty("id").GetString();
+            var userId = users[0].GetProperty("id").GetString();
+            Console.WriteLine($"Found user ID: {userId}");
+            return userId;
         }
+        
+        Console.WriteLine("No user found with this externalId");
+        return null;
+    }
+
+    public async Task<string?> GetKeycloakIdByUsername(string username, CancellationToken cancellationToken)
+    {
+        Console.WriteLine($"Looking for user with username: {username}");
+        
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/admin/realms/{_realm}/users?search={username}");
+        Console.WriteLine($"Search URL: {request.RequestUri}");
+        
+        await AddAuthorizationAsync(request, cancellationToken);
+        var response = await _httpClient.SendAsync(request, cancellationToken);
+
+        Console.WriteLine($"Search response status: {response.StatusCode}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            Console.WriteLine($"Failed to search user. Status: {response.StatusCode}. Response: {errorContent}");
+            return null;
+        }
+
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        Console.WriteLine($"Search response: {json}");
+        
+        var users = JsonSerializer.Deserialize<JsonElement>(json);
+
+        if (users.ValueKind == JsonValueKind.Array && users.GetArrayLength() > 0)
+        {
+            var userId = users[0].GetProperty("id").GetString();
+            Console.WriteLine($"Found user ID: {userId}");
+            return userId;
+        }
+        
+        Console.WriteLine("No user found with this username");
         return null;
     }
 

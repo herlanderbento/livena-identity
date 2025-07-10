@@ -1,4 +1,5 @@
 ﻿using Livena.Identity.Domain.Entity;
+using Livena.Identity.Domain.Shared;
 using Livena.Identity.infra.EntityFramework.Configurations;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,14 +8,19 @@ namespace Livena.Identity.infra.EntityFramework;
 public class LivenaIdentityDbContext: DbContext
 {
     public DbSet<User> Users => Set<User>();
+    public DbSet<RevokedToken> RevokedTokens => Set<RevokedToken>();
 
     public LivenaIdentityDbContext(DbContextOptions options) : base(options)
     {
     }
     
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new RevokedTokenConfiguration());
+        
+        // Exclude DomainEvent from the model since it's an abstract class
+        modelBuilder.Ignore<DomainEvent>();
     }
     
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

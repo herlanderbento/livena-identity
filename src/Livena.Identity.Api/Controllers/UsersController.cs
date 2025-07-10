@@ -106,7 +106,6 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     )
     {
         var request = new DeleteUserInput(id);
-        _requestValidator.Validate(request, cancellationToken);
         await _mediator.Send(request, cancellationToken);
         return NoContent();
     }

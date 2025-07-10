@@ -8,22 +8,16 @@ public class RevokedToken: AggregateRoot
 {
     public Guid UserId { get; private set; }
     public string AccessToken { get; private set; }
-    public string RefreshToken { get; private set; }
-    public TokenTypes TokenType { get; private set; }
     public DateTime ExpiresAt { get; private set; }
     public DateTime RevokedAt { get; private set; }
     
     public RevokedToken(
         Guid userId, 
         string accessToken, 
-        string refreshToken, 
-        TokenTypes tokenType, 
         DateTime expiresAt): base()
     {
         UserId = userId;
         AccessToken = accessToken;
-        RefreshToken = refreshToken;
-        TokenType = tokenType;
         ExpiresAt = DateTimeUtils.EnsureUtc(expiresAt);
         RevokedAt = DateTime.UtcNow;
 
@@ -34,8 +28,7 @@ public class RevokedToken: AggregateRoot
     {
         RevokedTokenValidator.Validate(
             UserId,
-            AccessToken,
-            RefreshToken
+            AccessToken
         );
     }
 }

@@ -35,7 +35,21 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
-      "protocolMappers": [],
+      "protocolMappers": [
+        {
+          "protocol": "openid-connect",
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "externalId",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "userId",
+            "jsonType.label": "String"
+          },
+          "name": "userId",
+          "protocolMapper": "oidc-usermodel-attribute-mapper"
+        }
+      ],
       "defaultClientScopes": [
         "web-origins",
         "role_list",
@@ -70,4 +84,4 @@
     ]
   },
   "groups": []
-} 
+}

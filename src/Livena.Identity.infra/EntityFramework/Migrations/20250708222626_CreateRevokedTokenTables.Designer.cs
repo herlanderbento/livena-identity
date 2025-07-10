@@ -3,6 +3,7 @@ using System;
 using Livena.Identity.infra.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Livena.Identity.infra.EntityFramework.Migrations
 {
     [DbContext(typeof(LivenaIdentityDbContext))]
-    partial class LivenaIdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250708222626_CreateRevokedTokenTables")]
+    partial class CreateRevokedTokenTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,8 +38,15 @@ namespace Livena.Identity.infra.EntityFramework.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TokenType")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");

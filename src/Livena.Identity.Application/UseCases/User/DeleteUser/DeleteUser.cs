@@ -27,8 +27,8 @@ public class DeleteUser : IDeleteUser
         
         NotFoundException.ThrowIfNull(user, $"User with ID {input.Id} not found.");
         
-        var keycloakId = await _keycloakService.GetKeycloakIdByExternalId(
-            user.Id.ToString(), 
+        var keycloakId = await _keycloakService.GetKeycloakIdByUsername(
+            user.Username, 
             cancellationToken);
         
         await _userRepository.Delete(user, cancellationToken);

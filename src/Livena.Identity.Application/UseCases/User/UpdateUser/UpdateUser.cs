@@ -9,17 +9,14 @@ public class UpdateUser : IUpdateUser
 {
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IKeycloakService _keycloakService;
     
     public UpdateUser(
         IUserRepository userRepository, 
-        IUnitOfWork unitOfWork,
-        IKeycloakService keycloakService
+        IUnitOfWork unitOfWork
         )
     {
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
-        _keycloakService = keycloakService;
     }
     
     public async Task<UserOutput> Handle(UpdateUserInput input, CancellationToken cancellationToken)
@@ -48,7 +45,6 @@ public class UpdateUser : IUpdateUser
         );
         
         await _userRepository.Update(user, cancellationToken);
-        await _keycloakService.Update(user, cancellationToken);
         await _unitOfWork.Commit(cancellationToken);
 
         return UserOutput.FromUser(user);

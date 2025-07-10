@@ -2,7 +2,7 @@
 using Livena.Identity.Application.Events;
 using Livena.Identity.Application.Interfaces;
 using Livena.Identity.Application.UseCases.User.CreateUser;
-using Livena.Identity.Api.ApiModels.User;
+using Livena.Identity.Application.UseCases.User.Logout;
 using Livena.Identity.Application.UseCases.User.UpdateUser;
 using Livena.Identity.Domain.Repository;
 using Livena.Identity.Domain.Shared;
@@ -20,6 +20,7 @@ public static class UseCasesConfiguration
     )
     {
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateUser).Assembly));
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Logout).Assembly));
         services.AddRepositories();
         services.AddValidators();
         services.AddDomainEvents();
@@ -31,6 +32,7 @@ public static class UseCasesConfiguration
     )
     {
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IRevokedTokenRepository, RevokedTokenRepository>();
         services.AddTransient<ICryptography, BCryptHasher>();
         services.AddTransient<IUnitOfWork, UnitOfWork>();
         services.AddHttpClient<IKeycloakService, KeycloakService>((serviceProvider, client) =>
@@ -49,6 +51,7 @@ public static class UseCasesConfiguration
     {
         services.AddValidatorsFromAssemblyContaining<CreateUserInputValidator>();
         services.AddValidatorsFromAssemblyContaining<UpdateUserInputValidator>();
+        services.AddValidatorsFromAssemblyContaining<LogoutInputValidator>();
         return services;
     }
     

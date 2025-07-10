@@ -69,7 +69,7 @@ public class KeycloakService : IKeycloakService
         }
 
         // Wait a moment for the user to be fully created
-        await Task.Delay(1000, cancellationToken);
+        await Task.Delay(500, cancellationToken);
         
         // Find the user by username and assign user role directly
         var keycloakUserId = await GetKeycloakIdByUsername(user.Username, cancellationToken);
@@ -79,7 +79,7 @@ public class KeycloakService : IKeycloakService
         }
     }
 
-    private async Task AssignUserRoleDirectly(string keycloakUserId, CancellationToken cancellationToken)
+    public async Task AssignUserRoleDirectly(string keycloakUserId, CancellationToken cancellationToken)
     {
         try
         {
@@ -120,41 +120,6 @@ public class KeycloakService : IKeycloakService
         }
     }
 
-    public async Task<string?> GetKeycloakIdByExternalId(string externalId, CancellationToken cancellationToken)
-    {
-        Console.WriteLine($"Looking for user with externalId: {externalId}");
-        
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/admin/realms/{_realm}/users?exact=true&first=0&max=1&q=externalId:{externalId}");
-        Console.WriteLine($"Search URL: {request.RequestUri}");
-        
-        await AddAuthorizationAsync(request, cancellationToken);
-        var response = await _httpClient.SendAsync(request, cancellationToken);
-
-        Console.WriteLine($"Search response status: {response.StatusCode}");
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            Console.WriteLine($"Failed to search user. Status: {response.StatusCode}. Response: {errorContent}");
-            return null;
-        }
-
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        Console.WriteLine($"Search response: {json}");
-        
-        var users = JsonSerializer.Deserialize<JsonElement>(json);
-
-        if (users.ValueKind == JsonValueKind.Array && users.GetArrayLength() > 0)
-        {
-            var userId = users[0].GetProperty("id").GetString();
-            Console.WriteLine($"Found user ID: {userId}");
-            return userId;
-        }
-        
-        Console.WriteLine("No user found with this externalId");
-        return null;
-    }
-
     public async Task<string?> GetKeycloakIdByUsername(string username, CancellationToken cancellationToken)
     {
         Console.WriteLine($"Looking for user with username: {username}");
@@ -192,7 +157,7 @@ public class KeycloakService : IKeycloakService
 
     public async Task Update(User user, CancellationToken cancellationToken)
     {
-        var keycloakUserId = await GetKeycloakIdByExternalId(user.Id.ToString(), cancellationToken);
+        var keycloakUserId = await GetKeycloakIdByUsername(user.Username, cancellationToken);
         if (keycloakUserId != null)
         {
             var keycloakUpdate = new
@@ -225,23 +190,7 @@ public class KeycloakService : IKeycloakService
         var response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
-
-    public async Task<object?> GetById(string keycloakUserId, CancellationToken cancellationToken)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/admin/realms/{_realm}/users/{keycloakUserId}");
-        await AddAuthorizationAsync(request, cancellationToken);
-        var response = await _httpClient.SendAsync(request, cancellationToken);
-        
-        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            return null;
-        }
-        
-        response.EnsureSuccessStatusCode();
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        return JsonSerializer.Deserialize<JsonElement>(json);
-    }
-
+    
     public async Task<KeycloakTokenResponse> Login(string username, string password, CancellationToken cancellationToken)
     {
         var content = new FormUrlEncodedContent(new[]
@@ -270,6 +219,14 @@ public class KeycloakService : IKeycloakService
             RefreshToken = data.GetProperty("refresh_token").GetString()!,
             ExpiresIn = data.GetProperty("expires_in").GetInt32()
         };
+    }
+
+    public async Task Logout(string keycloakUserId, CancellationToken cancellationToken)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/admin/realms/{_realm}/users/{keycloakUserId}/logout");
+        await AddAuthorizationAsync(request, cancellationToken);
+        var response = await _httpClient.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
     }
 
     private static StringContent CreateJsonContent(object obj)

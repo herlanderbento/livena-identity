@@ -5,27 +5,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Livena.Identity.infra.EntityFramework;
 
-public class LivenaIdentityDbContext: DbContext
+public class LivenaIdentityDbContext : DbContext
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<RevokedToken> RevokedTokens => Set<RevokedToken>();
 
-    public LivenaIdentityDbContext(DbContextOptions options) : base(options)
-    {
-    }
-    
+    public LivenaIdentityDbContext(DbContextOptions options)
+        : base(options) { }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new RevokedTokenConfiguration());
-        
+
         // Exclude DomainEvent from the model since it's an abstract class
         modelBuilder.Ignore<DomainEvent>();
     }
-    
+
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var entries = ChangeTracker.Entries()
+        var entries = ChangeTracker
+            .Entries()
             .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
         foreach (var entry in entries)
@@ -49,10 +49,11 @@ public class LivenaIdentityDbContext: DbContext
 
         return base.SaveChangesAsync(cancellationToken);
     }
-    
+
     public override int SaveChanges()
     {
-        var entries = ChangeTracker.Entries()
+        var entries = ChangeTracker
+            .Entries()
             .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
         foreach (var entry in entries)

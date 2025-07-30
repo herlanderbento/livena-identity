@@ -1,5 +1,5 @@
-using MediatR;
 using Livena.Identity.Application.UseCases.User.Common;
+using MediatR;
 
 namespace Livena.Identity.Application.UseCases.User.GetUser;
 

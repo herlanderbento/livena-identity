@@ -4,16 +4,16 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Livena.Identity.Api.Filters;
 
-
 public class AuthOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var hasAuthorize = context.MethodInfo.DeclaringType!.GetCustomAttributes(true)
-            .OfType<AuthorizeAttribute>()
-            .Any() || context.MethodInfo.GetCustomAttributes(true)
-            .OfType<AuthorizeAttribute>()
-            .Any();
+        var hasAuthorize =
+            context
+                .MethodInfo.DeclaringType!.GetCustomAttributes(true)
+                .OfType<AuthorizeAttribute>()
+                .Any()
+            || context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
 
         if (hasAuthorize)
         {
@@ -27,12 +27,12 @@ public class AuthOperationFilter : IOperationFilter
                             Reference = new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
+                                Id = "Bearer",
+                            },
                         },
                         Array.Empty<string>()
-                    }
-                }
+                    },
+                },
             };
         }
     }

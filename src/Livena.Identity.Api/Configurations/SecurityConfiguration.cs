@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Livena.Identity.Api.Authorization;
 using System.Security.Claims;
 using System.Text.Json;
+using Livena.Identity.Api.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Livena.Identity.Api.Configurations;
 
@@ -10,21 +10,27 @@ public static class SecurityConfiguration
 {
     public static IServiceCollection AddSecurity(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration
+    )
     {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
                 options.Authority = configuration["Jwt:Authority"];
                 options.Audience = configuration["Jwt:Audience"];
-                options.RequireHttpsMetadata = bool.Parse(configuration["Jwt:RequireHttpsMetadata"] ?? "false");
+                options.RequireHttpsMetadata = bool.Parse(
+                    configuration["Jwt:RequireHttpsMetadata"] ?? "false"
+                );
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = bool.Parse(configuration["Jwt:ValidateIssuer"] ?? "true"),
                     ValidateAudience = bool.Parse(configuration["Jwt:ValidateAudience"] ?? "true"),
                     ValidateLifetime = bool.Parse(configuration["Jwt:ValidateLifetime"] ?? "true"),
-                    ValidateIssuerSigningKey = bool.Parse(configuration["Jwt:ValidateIssuerSigningKey"] ?? "true"),
-                    ClockSkew = TimeSpan.Zero
+                    ValidateIssuerSigningKey = bool.Parse(
+                        configuration["Jwt:ValidateIssuerSigningKey"] ?? "true"
+                    ),
+                    ClockSkew = TimeSpan.Zero,
                 };
 
                 options.Events = new JwtBearerEvents
@@ -40,12 +46,17 @@ public static class SecurityConfiguration
                             {
                                 try
                                 {
-                                    var realmAccess = System.Text.Json.JsonSerializer.Deserialize<JsonElement>(realmAccessClaim.Value);
+                                    var realmAccess =
+                                        System.Text.Json.JsonSerializer.Deserialize<JsonElement>(
+                                            realmAccessClaim.Value
+                                        );
                                     if (realmAccess.TryGetProperty("roles", out var roles))
                                     {
                                         foreach (var role in roles.EnumerateArray())
                                         {
-                                            claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role.GetString()!));
+                                            claimsIdentity.AddClaim(
+                                                new Claim(ClaimTypes.Role, role.GetString()!)
+                                            );
                                         }
                                     }
                                 }
@@ -56,7 +67,7 @@ public static class SecurityConfiguration
                             }
                         }
                         return Task.CompletedTask;
-                    }
+                    },
                 };
             });
 

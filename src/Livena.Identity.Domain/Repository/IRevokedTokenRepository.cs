@@ -4,4 +4,6 @@ using Livena.Identity.Domain.Shared.SearchableRepository;
 
 namespace Livena.Identity.Domain.Repository;
 
-public interface IRevokedTokenRepository: IRepository<RevokedToken>, ISearchableRepository<RevokedToken, string>;
+public interface IRevokedTokenRepository
+    : IRepository<RevokedToken>,
+        ISearchableRepository<RevokedToken, string>;

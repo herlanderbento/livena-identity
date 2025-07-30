@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using System.Text.Json;
 using Livena.Identity.Api.Authorization;
 using Livena.Identity.Api.Helpers;
 using Livena.Identity.Api.Presenters;
@@ -7,8 +9,6 @@ using Livena.Identity.Application.UseCases.User.Logout;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Text.Json;
 
 namespace Livena.Identity.Api.Controllers;
 
@@ -27,28 +27,25 @@ public class AuthController(IMediator mediator, RequestValidator requestValidato
         CancellationToken cancellationToken
     )
     {
-        var input = new AuthenticateInput(
-            request.Username,
-            request.Password
-        );
+        var input = new AuthenticateInput(request.Username, request.Password);
         var output = await _mediator.Send(input, cancellationToken);
         return Ok(new ApiPresenter<AuthenticateOutput>(output));
     }
-    
-    
+
     [HttpDelete("/logout")]
     [Authorize(Roles = $"{Roles.User},{Roles.Admin}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Logout(
-        CancellationToken cancellationToken
-    )
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
         try
         {
             var authHeader = Request.Headers["Authorization"].FirstOrDefault();
-            var (username, accessToken, expiresAt) = JwtTokenHelper.ExtractTokenInfo(User, authHeader);
+            var (username, accessToken, expiresAt) = JwtTokenHelper.ExtractTokenInfo(
+                User,
+                authHeader
+            );
 
             var input = new LogoutInput(username, accessToken, expiresAt);
             _requestValidator.Validate(input, cancellationToken);
@@ -57,13 +54,14 @@ public class AuthController(IMediator mediator, RequestValidator requestValidato
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Invalid Token",
-                Detail = ex.Message,
-                Status = StatusCodes.Status400BadRequest
-            });
+            return BadRequest(
+                new ProblemDetails
+                {
+                    Title = "Invalid Token",
+                    Detail = ex.Message,
+                    Status = StatusCodes.Status400BadRequest,
+                }
+            );
         }
     }
 }
-    

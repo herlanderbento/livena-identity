@@ -4,38 +4,38 @@ using Microsoft.Extensions.Logging;
 
 namespace Livena.Identity.infra.EntityFramework;
 
-public class UnitOfWork: IUnitOfWork
+public class UnitOfWork : IUnitOfWork
 {
     private readonly LivenaIdentityDbContext _context;
     private readonly IDomainEventPublisher _publisher;
     private readonly ILogger<UnitOfWork> _logger;
 
     public UnitOfWork(
-        LivenaIdentityDbContext context, 
-        IDomainEventPublisher publisher, 
-        ILogger<UnitOfWork> logger)
+        LivenaIdentityDbContext context,
+        IDomainEventPublisher publisher,
+        ILogger<UnitOfWork> logger
+    )
     {
         _context = context;
         _publisher = publisher;
         _logger = logger;
     }
-    
+
     public async Task Commit(CancellationToken cancellationToken)
     {
-        var aggregateRoots = _context.ChangeTracker
-            .Entries<AggregateRoot>()
+        var aggregateRoots = _context
+            .ChangeTracker.Entries<AggregateRoot>()
             .Where(entry => entry.Entity.Events.Any())
             .Select(entry => entry.Entity);
 
         _logger.LogInformation(
             "Commit: {AggregatesCount} aggregate roots with events.",
-            aggregateRoots.Count());
+            aggregateRoots.Count()
+        );
 
-        var events = aggregateRoots
-            .SelectMany(aggregate => aggregate.Events);
+        var events = aggregateRoots.SelectMany(aggregate => aggregate.Events);
 
-        _logger.LogInformation(
-            "Commit: {EventsCount} events raised.", events.Count());
+        _logger.LogInformation("Commit: {EventsCount} events raised.", events.Count());
 
         foreach (var @event in events)
             await _publisher.PublishAsync((dynamic)@event, cancellationToken);
@@ -46,6 +46,5 @@ public class UnitOfWork: IUnitOfWork
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task Rollback(CancellationToken cancellationToken)
-        => Task.CompletedTask;
+    public Task Rollback(CancellationToken cancellationToken) => Task.CompletedTask;
 }

@@ -13,16 +13,16 @@ public record UserOutput
     public DateTime UpdatedAt { get; set; }
 
     public UserOutput(
-        Guid id, 
-        string username, 
-        string? email, 
-        string? phone, 
-        DateTime birthday, 
-        bool? isVerified, 
-        bool isActive, 
-        DateTime createdAt, 
+        Guid id,
+        string username,
+        string? email,
+        string? phone,
+        DateTime birthday,
+        bool? isVerified,
+        bool isActive,
+        DateTime createdAt,
         DateTime updatedAt
-        )
+    )
     {
         Id = id;
         Username = username;
@@ -35,8 +35,8 @@ public record UserOutput
         UpdatedAt = updatedAt;
     }
 
-    public static UserOutput FromUser(Domain.Entity.User user)
-        => new(
+    public static UserOutput FromUser(Domain.Entity.User user) =>
+        new(
             user.Id,
             user.Username,
             user.Email,
@@ -46,6 +46,5 @@ public record UserOutput
             user.IsActive,
             user.CreatedAt,
             user.UpdatedAt
-        );    
-    
+        );
 }

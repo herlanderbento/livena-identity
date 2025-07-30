@@ -9,9 +9,9 @@ public class DeleteUser : IDeleteUser
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IKeycloakService _keycloakService;
-    
+
     public DeleteUser(
-        IUserRepository userRepository, 
+        IUserRepository userRepository,
         IUnitOfWork unitOfWork,
         IKeycloakService keycloakService
     )
@@ -20,20 +20,21 @@ public class DeleteUser : IDeleteUser
         _unitOfWork = unitOfWork;
         _keycloakService = keycloakService;
     }
-    
+
     public async Task Handle(DeleteUserInput input, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetById(input.Id, cancellationToken);
-        
+
         NotFoundException.ThrowIfNull(user, $"User with ID {input.Id} not found.");
-        
+
         var keycloakId = await _keycloakService.GetKeycloakIdByUsername(
-            user.Username, 
-            cancellationToken);
-        
+            user.Username,
+            cancellationToken
+        );
+
         await _userRepository.Delete(user, cancellationToken);
         await _unitOfWork.Commit(cancellationToken);
-        
+
         if (keycloakId != null)
         {
             await _keycloakService.Delete(keycloakId, cancellationToken);

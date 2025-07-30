@@ -21,11 +21,12 @@ public class LogoutInputValidator : AbstractValidator<LogoutInput>
 {
     public LogoutInputValidator()
     {
-        RuleFor(x => x.AccessToken)
-            .NotEmpty().WithMessage("AccessToken is required.");
-        
+        RuleFor(x => x.AccessToken).NotEmpty().WithMessage("AccessToken is required.");
+
         RuleFor(x => x.ExpiresAt)
-            .NotEmpty().WithMessage("ExpiresAt is required.")
-            .Must(date => date != default).WithMessage("ExpiresAt is required.");
+            .NotEmpty()
+            .WithMessage("ExpiresAt is required.")
+            .Must(date => date != default)
+            .WithMessage("ExpiresAt is required.");
     }
 }

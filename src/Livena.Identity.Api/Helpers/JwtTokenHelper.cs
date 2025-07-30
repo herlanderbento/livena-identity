@@ -4,13 +4,18 @@ namespace Livena.Identity.Api.Helpers;
 
 public static class JwtTokenHelper
 {
-    public static (string username, string accessToken, DateTime expiresAt) ExtractTokenInfo(ClaimsPrincipal user, string authorizationHeader)
+    public static (string username, string accessToken, DateTime expiresAt) ExtractTokenInfo(
+        ClaimsPrincipal user,
+        string authorizationHeader
+    )
     {
         // Get username from preferred_username claim
         var usernameClaim = user.FindFirst("preferred_username");
         if (usernameClaim == null)
         {
-            throw new InvalidOperationException("Username not found in token (preferred_username claim missing)");
+            throw new InvalidOperationException(
+                "Username not found in token (preferred_username claim missing)"
+            );
         }
         var username = usernameClaim.Value;
 
@@ -29,4 +34,4 @@ public static class JwtTokenHelper
 
         return (username, accessToken, expiresAt);
     }
-} 
+}

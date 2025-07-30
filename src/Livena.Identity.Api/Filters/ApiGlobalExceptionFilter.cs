@@ -5,19 +5,18 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Livena.Identity.Api.Filters;
 
-
 public class ApiGlobalExceptionFilter : IExceptionFilter
 {
     private readonly IHostEnvironment _env;
-    public ApiGlobalExceptionFilter(IHostEnvironment env)
-        => _env = env;
+
+    public ApiGlobalExceptionFilter(IHostEnvironment env) => _env = env;
 
     public void OnException(ExceptionContext context)
     {
         var details = new ProblemDetails();
         var exception = context.Exception;
 
-        if(exception is EntityValidationException entityValidationException)
+        if (exception is EntityValidationException entityValidationException)
         {
             details.Status = StatusCodes.Status422UnprocessableEntity;
             details.Type = "UnprocessableEntity";
@@ -48,7 +47,7 @@ public class ApiGlobalExceptionFilter : IExceptionFilter
             details.Detail = exception.Message;
         }
 
-        context.HttpContext.Response.StatusCode = (int) details.Status;
+        context.HttpContext.Response.StatusCode = (int)details.Status;
         context.Result = new ObjectResult(details);
         context.ExceptionHandled = true;
     }

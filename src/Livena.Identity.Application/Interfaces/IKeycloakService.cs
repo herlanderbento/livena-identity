@@ -17,5 +17,10 @@ public interface IKeycloakService
     Task Delete(string keycloakUserId, CancellationToken cancellationToken);
     Task Logout(string keycloakUserId, CancellationToken cancellationToken);
     Task AssignUserRoleDirectly(string keycloakUserId, CancellationToken cancellationToken);
-    Task<KeycloakTokenResponse> Login(string username, string password, CancellationToken cancellationToken);
+    Task<string?> GetRoleIdByName(string roleName, CancellationToken cancellationToken);
+    Task<KeycloakTokenResponse> Login(
+        string username,
+        string password,
+        CancellationToken cancellationToken
+    );
 }

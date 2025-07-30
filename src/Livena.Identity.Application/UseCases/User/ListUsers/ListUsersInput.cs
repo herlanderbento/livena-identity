@@ -11,12 +11,10 @@ public class ListUsersInput : PaginatedListInput<string>, IRequest<ListUsersOutp
         int perPage = 15,
         string search = "",
         string sort = "",
-        SearchOrder dir = SearchOrder.Asc) : 
-        base(page, perPage, search, sort, dir)
-    {
-    }
-    
-    public ListUsersInput() 
-        : base(1, 15, "", "", SearchOrder.Asc)
-    { }
+        SearchOrder dir = SearchOrder.Asc
+    )
+        : base(page, perPage, search, sort, dir) { }
+
+    public ListUsersInput()
+        : base(1, 15, "", "", SearchOrder.Asc) { }
 }

@@ -4,6 +4,5 @@ public class ApiPresenter<TData>
 {
     public TData Data { get; private set; }
 
-    public ApiPresenter(TData data) 
-        => Data = data;
+    public ApiPresenter(TData data) => Data = data;
 }

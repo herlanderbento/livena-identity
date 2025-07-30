@@ -4,14 +4,14 @@ using Livena.Identity.Api.Presenters;
 using Livena.Identity.Api.Validators;
 using Livena.Identity.Application.UseCases.User.Common;
 using Livena.Identity.Application.UseCases.User.CreateUser;
-using Livena.Identity.Application.UseCases.User.UpdateUser;
 using Livena.Identity.Application.UseCases.User.DeleteUser;
 using Livena.Identity.Application.UseCases.User.GetUser;
 using Livena.Identity.Application.UseCases.User.ListUsers;
+using Livena.Identity.Application.UseCases.User.UpdateUser;
 using Livena.Identity.Domain.Shared.SearchableRepository;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Livena.Identity.Api.Controllers;
 
@@ -33,7 +33,11 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     {
         _requestValidator.Validate(request, cancellationToken);
         var output = await _mediator.Send(request, cancellationToken);
-        return CreatedAtAction(nameof(Create), new { output.Id }, new ApiPresenter<UserOutput>(output));
+        return CreatedAtAction(
+            nameof(Create),
+            new { output.Id },
+            new ApiPresenter<UserOutput>(output)
+        );
     }
 
     [HttpGet]
@@ -49,19 +53,23 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     )
     {
         var input = new ListUsersInput();
-        if (page is not null) input.Page = page.Value;
-        if (perPage is not null) input.PerPage = perPage.Value;
-        if (!String.IsNullOrWhiteSpace(search)) input.Search = search;
-        if (!String.IsNullOrWhiteSpace(sort)) input.Sort = sort;
-        if (dir is not null) input.Dir = dir.Value;
+        if (page is not null)
+            input.Page = page.Value;
+        if (perPage is not null)
+            input.PerPage = perPage.Value;
+        if (!String.IsNullOrWhiteSpace(search))
+            input.Search = search;
+        if (!String.IsNullOrWhiteSpace(sort))
+            input.Sort = sort;
+        if (dir is not null)
+            input.Dir = dir.Value;
 
         var output = await _mediator.Send(input, cancellationToken);
-        return Ok(
-            new ApiPresenterList<UserOutput>(output)
-        );
+        return Ok(new ApiPresenterList<UserOutput>(output));
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Admin}, {Roles.User}")]
     [ProducesResponseType(typeof(ApiPresenter<UserOutput>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(
@@ -100,10 +108,7 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(
-        Guid id,
-        CancellationToken cancellationToken
-    )
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var request = new DeleteUserInput(id);
         await _mediator.Send(request, cancellationToken);

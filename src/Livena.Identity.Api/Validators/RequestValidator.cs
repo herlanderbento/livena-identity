@@ -3,7 +3,6 @@ using Livena.Identity.Domain.Shared.Exceptions;
 
 namespace Livena.Identity.Api.Validators;
 
-
 public class RequestValidator(IServiceProvider serviceProvider)
 {
     public void Validate<T>(T request, CancellationToken cancellationToken)
@@ -13,8 +12,8 @@ public class RequestValidator(IServiceProvider serviceProvider)
 
         if (!validationResult.IsValid)
         {
-            var errorMessages = validationResult.Errors
-                .Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
+            var errorMessages = validationResult
+                .Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
                 .ToList();
 
             throw new EntityValidationException(string.Join(" | ", errorMessages));

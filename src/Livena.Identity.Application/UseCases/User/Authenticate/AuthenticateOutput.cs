@@ -8,11 +8,7 @@ public class AuthenticateOutput
     public string RefreshToken { get; set; }
     public UserOutput User { get; set; }
 
-
-    public AuthenticateOutput(
-        string accessToken, 
-        string refreshToken, 
-        UserOutput user)
+    public AuthenticateOutput(string accessToken, string refreshToken, UserOutput user)
     {
         AccessToken = accessToken;
         RefreshToken = refreshToken;

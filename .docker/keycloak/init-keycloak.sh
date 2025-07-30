@@ -1,104 +1,87 @@
-#!/bin/bash
+#!/bin/sh
 
-# Wait for Keycloak to be ready
-echo "Waiting for Keycloak to be ready..."
-until curl -s http://localhost:8081/health > /dev/null; do
-    echo "Keycloak is not ready yet. Waiting..."
-    sleep 5
+set -e
+
+KEYCLOAK_URL="http://localhost:8081"
+KEYCLOAK_INTERNAL="http://localhost:8080"
+REALM="livena-dev"
+CLIENT_ID="backend-client"
+ADMIN_USER="admin"
+ADMIN_PASSWORD="admin"
+
+echo "⏳ Aguardando Keycloak ficar pronto..."
+until curl -s "$KEYCLOAK_URL/health" > /dev/null; do
+  echo "🔄 Esperando Keycloak..."
+  sleep 5
 done
+echo "✅ Keycloak pronto!"
 
-echo "Keycloak is ready!"
+echo "🔐 Obtendo token de admin..."
+ADMIN_TOKEN=$(curl -s -X POST "$KEYCLOAK_URL/realms/master/protocol/openid-connect/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password" \
+  -d "client_id=admin-cli" \
+  -d "username=$ADMIN_USER" \
+  -d "password=$ADMIN_PASSWORD" | jq -r '.access_token')
 
-# Get admin token
-echo "Getting admin token..."
-ADMIN_TOKEN=$(curl -s -X POST http://localhost:8081/realms/master/protocol/openid-connect/token \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "grant_type=password&client_id=admin-cli&username=admin&password=admin" | jq -r '.access_token')
+[ -z "$ADMIN_TOKEN" ] && echo "❌ Erro ao obter token." && exit 1
+echo "✅ Token obtido."
 
-if [ "$ADMIN_TOKEN" = "null" ] || [ -z "$ADMIN_TOKEN" ]; then
-    echo "Failed to get admin token"
-    exit 1
-fi
+get_client_id() {
+  curl -s -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" \
+    "$KEYCLOAK_URL/admin/realms/$REALM/clients" | jq -r ".[] | select(.clientId == \"$1\") | .id"
+}
 
-echo "Admin token obtained successfully"
+get_role_id() {
+  curl -s -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" \
+    "$KEYCLOAK_URL/admin/realms/$REALM/clients/$1/roles" | jq -r ".[] | select(.name == \"$2\") | .id"
+}
 
-# Get backend-client ID
-echo "Getting backend-client ID..."
-BACKEND_CLIENT_ID=$(curl -s -X GET "http://localhost:8081/admin/realms/livena-dev/clients" \
-    -H "Authorization: Bearer $ADMIN_TOKEN" \
-    -H "Content-Type: application/json" | jq -r '.[] | select(.clientId == "backend-client") | .id')
+BACKEND_CLIENT_ID=$(get_client_id "$CLIENT_ID")
+REALM_MANAGEMENT_ID=$(get_client_id "realm-management")
+MANAGE_USERS_ROLE_ID=$(get_role_id "$REALM_MANAGEMENT_ID" "manage-users")
+VIEW_USERS_ROLE_ID=$(get_role_id "$REALM_MANAGEMENT_ID" "view-users")
 
-if [ "$BACKEND_CLIENT_ID" = "null" ] || [ -z "$BACKEND_CLIENT_ID" ]; then
-    echo "Failed to get backend-client ID"
-    exit 1
-fi
+[ -z "$BACKEND_CLIENT_ID" ] && echo "❌ backend-client não encontrado." && exit 1
+[ -z "$REALM_MANAGEMENT_ID" ] && echo "❌ realm-management não encontrado." && exit 1
+[ -z "$MANAGE_USERS_ROLE_ID" ] && echo "❌ manage-users role não encontrada." && exit 1
+[ -z "$VIEW_USERS_ROLE_ID" ] && echo "❌ view-users role não encontrada." && exit 1
 
-echo "Backend-client ID: $BACKEND_CLIENT_ID"
+echo "✅ IDs obtidos."
 
-# Get realm-management client ID
-echo "Getting realm-management client ID..."
-REALM_MANAGEMENT_ID=$(curl -s -X GET "http://localhost:8081/admin/realms/livena-dev/clients" \
-    -H "Authorization: Bearer $ADMIN_TOKEN" \
-    -H "Content-Type: application/json" | jq -r '.[] | select(.clientId == "realm-management") | .id')
+echo "🔎 Buscando service account ID..."
+SERVICE_ACCOUNT_ID=$(curl -s -H "Authorization: Bearer $ADMIN_TOKEN" \
+  "$KEYCLOAK_URL/admin/realms/$REALM/clients/$BACKEND_CLIENT_ID/service-account-user" | jq -r '.id')
 
-if [ "$REALM_MANAGEMENT_ID" = "null" ] || [ -z "$REALM_MANAGEMENT_ID" ]; then
-    echo "Failed to get realm-management client ID"
-    exit 1
-fi
+[ -z "$SERVICE_ACCOUNT_ID" ] && echo "❌ Service account não encontrada." && exit 1
 
-echo "Realm-management ID: $REALM_MANAGEMENT_ID"
+echo "✅ Service account ID: $SERVICE_ACCOUNT_ID"
 
-# Get manage-users role ID
-echo "Getting manage-users role ID..."
-MANAGE_USERS_ROLE_ID=$(curl -s -X GET "http://localhost:8081/admin/realms/livena-dev/clients/$REALM_MANAGEMENT_ID/roles" \
-    -H "Authorization: Bearer $ADMIN_TOKEN" \
-    -H "Content-Type: application/json" | jq -r '.[] | select(.name == "manage-users") | .id')
+echo "➕ Atribuindo roles à service account..."
 
-if [ "$MANAGE_USERS_ROLE_ID" = "null" ] || [ -z "$MANAGE_USERS_ROLE_ID" ]; then
-    echo "Failed to get manage-users role ID"
-    exit 1
-fi
+curl -s -X POST "$KEYCLOAK_URL/admin/realms/$REALM/users/$SERVICE_ACCOUNT_ID/role-mappings/clients/$REALM_MANAGEMENT_ID" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "[
+    {\"id\": \"$MANAGE_USERS_ROLE_ID\", \"name\": \"manage-users\"},
+    {\"id\": \"$VIEW_USERS_ROLE_ID\", \"name\": \"view-users\"}
+  ]"
 
-echo "Manage-users role ID: $MANAGE_USERS_ROLE_ID"
+echo "✅ Roles atribuídas à service account."
 
-# Get view-users role ID
-echo "Getting view-users role ID..."
-VIEW_USERS_ROLE_ID=$(curl -s -X GET "http://localhost:8081/admin/realms/livena-dev/clients/$REALM_MANAGEMENT_ID/roles" \
-    -H "Authorization: Bearer $ADMIN_TOKEN" \
-    -H "Content-Type: application/json" | jq -r '.[] | select(.name == "view-users") | .id')
+echo "🌐 Atribuindo role 'user' como padrão do realm..."
 
-if [ "$VIEW_USERS_ROLE_ID" = "null" ] || [ -z "$VIEW_USERS_ROLE_ID" ]; then
-    echo "Failed to get view-users role ID"
-    exit 1
-fi
+# Autenticando via kcadm dentro do container
+/opt/keycloak/bin/kcadm.sh config credentials \
+  --server "$KEYCLOAK_INTERNAL" \
+  --realm master \
+  --user "$ADMIN_USER" \
+  --password "$ADMIN_PASSWORD"
 
-echo "View-users role ID: $VIEW_USERS_ROLE_ID"
+# Adicionando a role 'user' como default
+/opt/keycloak/bin/kcadm.sh add-roles \
+  --rname default-roles-$REALM \
+  --rolename user \
+  --realm $REALM
 
-# Get service account user ID
-echo "Getting service account user ID..."
-SERVICE_ACCOUNT_ID=$(curl -s -X GET "http://localhost:8081/admin/realms/livena-dev/clients/$BACKEND_CLIENT_ID/service-account-user" \
-    -H "Authorization: Bearer $ADMIN_TOKEN" \
-    -H "Content-Type: application/json" | jq -r '.id')
-
-if [ "$SERVICE_ACCOUNT_ID" = "null" ] || [ -z "$SERVICE_ACCOUNT_ID" ]; then
-    echo "Failed to get service account user ID"
-    exit 1
-fi
-
-echo "Service account user ID: $SERVICE_ACCOUNT_ID"
-
-# Assign manage-users and view-users roles to service account
-echo "Assigning manage-users and view-users roles to service account..."
-curl -s -X POST "http://localhost:8081/admin/realms/livena-dev/users/$SERVICE_ACCOUNT_ID/role-mappings/clients/$REALM_MANAGEMENT_ID" \
-    -H "Authorization: Bearer $ADMIN_TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "[{\"id\": \"$MANAGE_USERS_ROLE_ID\", \"name\": \"manage-users\"}, {\"id\": \"$VIEW_USERS_ROLE_ID\", \"name\": \"view-users\"}]"
-
-if [ $? -eq 0 ]; then
-    echo "Successfully assigned manage-users and view-users roles to service account"
-else
-    echo "Failed to assign roles to service account"
-    exit 1
-fi
-
-echo "Keycloak permissions configured successfully!" 
+echo "✅ Role 'user' adicionada como default do realm $REALM."

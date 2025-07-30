@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-
 
 namespace Livena.Identity.infra.EntityFramework;
 
@@ -11,7 +10,9 @@ public class LivenaIdentityDbContextFactory : IDesignTimeDbContextFactory<Livena
     {
         var optionsBuilder = new DbContextOptionsBuilder<LivenaIdentityDbContext>();
 
-        var basePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "../Livena.Identity.Api"));
+        var basePath = Path.GetFullPath(
+            Path.Combine(Directory.GetCurrentDirectory(), "../Livena.Identity.Api")
+        );
 
         var configuration = new ConfigurationBuilder()
             .SetBasePath(basePath)

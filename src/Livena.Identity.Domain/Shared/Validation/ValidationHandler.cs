@@ -3,8 +3,6 @@ namespace Livena.Identity.Domain.Shared.Validation;
 public abstract class ValidationHandler
 {
     public abstract void HandleError(ValidationError error);
-    
-    public void HandleError(string message)
-        => HandleError(new ValidationError(message));
-    
+
+    public void HandleError(string message) => HandleError(new ValidationError(message));
 }

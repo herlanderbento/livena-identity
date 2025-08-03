@@ -3,17 +3,20 @@ using System;
 using Livena.Identity.infra.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Livena.Identity.infra.EntityFramework.Migrations
+namespace Livena.Identity.infra.Migrations
 {
     [DbContext(typeof(LivenaIdentityDbContext))]
-    partial class LivenaIdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250803162511_InitialIdentitySchema")]
+    partial class InitialIdentitySchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,10 +52,7 @@ namespace Livena.Identity.infra.EntityFramework.Migrations
                     b.HasKey("Id")
                         .HasName("p_k_revoked_tokens");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("i_x_revoked_tokens_user_id");
-
-                    b.ToTable("revoked_tokens", (string)null);
+                    b.ToTable("revoked_tokens");
                 });
 
             modelBuilder.Entity("Livena.Identity.Domain.Entity.User", b =>
@@ -112,7 +112,7 @@ namespace Livena.Identity.infra.EntityFramework.Migrations
                     b.HasKey("Id")
                         .HasName("p_k_users");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("Livena.Identity.Domain.Entity.UserCode", b =>
@@ -152,30 +152,7 @@ namespace Livena.Identity.infra.EntityFramework.Migrations
                     b.HasKey("Id")
                         .HasName("p_k_user_codes");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("i_x_user_codes_user_id");
-
-                    b.ToTable("user_codes", (string)null);
-                });
-
-            modelBuilder.Entity("Livena.Identity.Domain.Entity.RevokedToken", b =>
-                {
-                    b.HasOne("Livena.Identity.Domain.Entity.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_revoked_tokens_users");
-                });
-
-            modelBuilder.Entity("Livena.Identity.Domain.Entity.UserCode", b =>
-                {
-                    b.HasOne("Livena.Identity.Domain.Entity.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_codes_users");
+                    b.ToTable("user_codes");
                 });
 #pragma warning restore 612, 618
         }

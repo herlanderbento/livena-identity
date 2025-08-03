@@ -20,7 +20,6 @@ public class UserRepository(LivenaIdentityDbContext context) : IUserRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-        NotFoundException.ThrowIfNull(model, $"User '{id}' not found.");
         return model!;
     }
 
@@ -56,7 +55,10 @@ public class UserRepository(LivenaIdentityDbContext context) : IUserRepository
         CancellationToken cancellationToken
     )
     {
-        var models = await Users.AsNoTracking().Where(user => ids.Contains(user.Id)).ToListAsync();
+        var models = await Users
+            .AsNoTracking()
+            .Where(user => ids.Contains(user.Id))
+            .ToListAsync(cancellationToken);
 
         return models;
     }

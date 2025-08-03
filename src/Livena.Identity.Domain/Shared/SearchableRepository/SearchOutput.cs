@@ -7,11 +7,8 @@ public class SearchOutput<TAggregate>
     public int PerPage { get; set; }
     public int Total { get; set; }
     public IReadOnlyList<TAggregate> Items { get; set; }
-    public SearchOutput(
-        int currentPage, 
-        int perPage, 
-        int total, 
-        IReadOnlyList<TAggregate> items)
+
+    public SearchOutput(int currentPage, int perPage, int total, IReadOnlyList<TAggregate> items)
     {
         CurrentPage = currentPage;
         PerPage = perPage;

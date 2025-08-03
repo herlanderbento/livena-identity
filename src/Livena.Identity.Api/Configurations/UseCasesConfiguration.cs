@@ -4,6 +4,7 @@ using Livena.Identity.Application.Interfaces;
 using Livena.Identity.Application.UseCases.User.CreateUser;
 using Livena.Identity.Application.UseCases.User.Logout;
 using Livena.Identity.Application.UseCases.User.UpdateUser;
+using Livena.Identity.Application.UseCases.User.VerifyAccount;
 using Livena.Identity.Domain.Repository;
 using Livena.Identity.Domain.Shared;
 using Livena.Identity.infra.Cryptography;
@@ -29,6 +30,7 @@ public static class UseCasesConfiguration
     {
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IRevokedTokenRepository, RevokedTokenRepository>();
+        services.AddTransient<IUserCodeRepository, UserCodeRepository>();
         services.AddTransient<ICryptography, BCryptHasher>();
         services.AddTransient<IUnitOfWork, UnitOfWork>();
         services.AddHttpClient<IKeycloakService, KeycloakService>(
@@ -48,6 +50,7 @@ public static class UseCasesConfiguration
         services.AddValidatorsFromAssemblyContaining<CreateUserInputValidator>();
         services.AddValidatorsFromAssemblyContaining<UpdateUserInputValidator>();
         services.AddValidatorsFromAssemblyContaining<LogoutInputValidator>();
+        services.AddValidatorsFromAssemblyContaining<VerifyAccountInputValidator>();
         return services;
     }
 

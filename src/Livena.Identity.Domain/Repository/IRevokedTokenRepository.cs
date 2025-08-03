@@ -7,3 +7,4 @@ namespace Livena.Identity.Domain.Repository;
 public interface IRevokedTokenRepository
     : IRepository<RevokedToken>,
         ISearchableRepository<RevokedToken, string>;
+

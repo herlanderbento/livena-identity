@@ -1,6 +1,7 @@
 ﻿using Livena.Identity.Application.Exceptions;
 using Livena.Identity.Application.Interfaces;
 using Livena.Identity.Application.UseCases.User.Common;
+using Livena.Identity.Domain.Enum;
 using Livena.Identity.Domain.Repository;
 using DomainEntity = Livena.Identity.Domain.Entity;
 
@@ -9,18 +10,21 @@ namespace Livena.Identity.Application.UseCases.User.CreateUser;
 public class CreateUser : ICreateUser
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUserCodeRepository _userCodeRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICryptography _cryptography;
     private readonly IKeycloakService _keycloakService;
 
     public CreateUser(
         IUserRepository userRepository,
+        IUserCodeRepository userCodeRepository,
         IUnitOfWork unitOfWork,
         ICryptography cryptography,
         IKeycloakService keycloakService
     )
     {
         _userRepository = userRepository;
+        _userCodeRepository = userCodeRepository;
         _unitOfWork = unitOfWork;
         _cryptography = cryptography;
         _keycloakService = keycloakService;
@@ -28,13 +32,13 @@ public class CreateUser : ICreateUser
 
     public async Task<UserOutput> Handle(CreateUserInput input, CancellationToken cancellationToken)
     {
-        var userWithUsername = await _userRepository.GetByUsername(
+        var userWithSameUsername = await _userRepository.GetByUsername(
             input.Username,
             cancellationToken
         );
 
         ConflictException.ThrowIfNotNull(
-            userWithUsername,
+            userWithSameUsername,
             $"Username '{input.Username}' is already taken."
         );
 
@@ -73,8 +77,15 @@ public class CreateUser : ICreateUser
         );
 
         await _userRepository.Insert(entity, cancellationToken);
-        await _unitOfWork.Commit(cancellationToken);
         await _keycloakService.Insert(entity, input.Password, cancellationToken);
+
+        var userCode = new DomainEntity.UserCode(
+            entity.Id,
+            VerificationPurpose.AccountVerification
+        );
+
+        await _userCodeRepository.Insert(userCode, cancellationToken);
+        await _unitOfWork.Commit(cancellationToken);
 
         return UserOutput.FromUser(entity);
     }

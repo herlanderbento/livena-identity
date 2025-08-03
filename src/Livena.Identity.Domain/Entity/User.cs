@@ -4,11 +4,11 @@ using Livena.Identity.Domain.Validator;
 
 namespace Livena.Identity.Domain.Entity;
 
-public class User: AggregateRoot
+public class User : AggregateRoot
 {
     public string Username { get; private set; }
     public string? Email { get; private set; }
-    public string? Phone { get; private set;  }
+    public string? Phone { get; private set; }
     public string Password { get; private set; }
     public DateTime Birthday { get; private set; }
     public Roles Role { get; private set; }
@@ -19,13 +19,15 @@ public class User: AggregateRoot
 
     public User(
         string username,
-        string? email, 
-        string? phone, 
-        string password, 
-        DateTime birthday, 
-        Roles role = Roles.User, 
+        string? email,
+        string? phone,
+        string password,
+        DateTime birthday,
+        Roles role = Roles.User,
         bool? isVerified = false,
-        bool isActive = true): base()
+        bool isActive = true
+    )
+        : base()
     {
         Username = username;
         Email = email ?? null;
@@ -40,33 +42,29 @@ public class User: AggregateRoot
 
         Validate();
     }
-    
-    public void Update(
-        string? email, 
-        string? phone, 
-        DateTime? birthday, 
-        bool? isActive)
+
+    public void Update(string? email, string? phone, DateTime? birthday, bool? isActive)
     {
         Email = email ?? Email;
         Phone = phone ?? Phone;
         Birthday = birthday.HasValue ? DateTimeUtils.EnsureUtc(birthday.Value) : Birthday;
         IsActive = isActive ?? IsActive;
-        
+
         UpdatedAt = DateTime.UtcNow;
-        
+
         Validate();
     }
-    
+
     public void ChangePassword(string? password)
     {
         Password = password ?? Password;
     }
-    
+
     public void Activate()
     {
         IsActive = true;
     }
-    
+
     public void Deactivate()
     {
         IsActive = false;
@@ -81,13 +79,9 @@ public class User: AggregateRoot
     {
         IsVerified = false;
     }
-    
+
     private void Validate()
     {
-        UserValidator.Validate(
-            Username,
-            Email, 
-            Password
-        );
+        UserValidator.Validate(Username, Email, Password);
     }
 }

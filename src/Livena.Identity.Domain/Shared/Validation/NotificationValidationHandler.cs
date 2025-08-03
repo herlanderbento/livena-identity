@@ -3,15 +3,12 @@ namespace Livena.Identity.Domain.Shared.Validation;
 public class NotificationValidationHandler : ValidationHandler
 {
     private readonly List<ValidationError> _errors;
-    
-    public NotificationValidationHandler()
-        => _errors = new List<ValidationError>();
-    
-    public IReadOnlyCollection<ValidationError> Errors 
-        => _errors.AsReadOnly();
+
+    public NotificationValidationHandler() => _errors = new List<ValidationError>();
+
+    public IReadOnlyCollection<ValidationError> Errors => _errors.AsReadOnly();
 
     public bool HasErrors() => _errors.Count > 0;
 
-    public override void HandleError(ValidationError error)
-        => _errors.Add(error);
+    public override void HandleError(ValidationError error) => _errors.Add(error);
 }

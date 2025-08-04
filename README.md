@@ -37,6 +37,21 @@ docker-compose up -d
 
 This will spin up the necessary containers for the application and database.
 
+## Keycloak Setup (Required after every Keycloak deployment)
+
+⚠️ **IMPORTANT:** Ensure the `backend-client` has the correct permissions assigned to its Service Account:
+
+1. Go to **Clients** → `backend-client` → **Service Account Roles**
+2. Select the client: `realm-management`
+3. Add the following roles:
+   - `manage-users`
+   - `view-users`
+4. *(Optional)*: You may also add roles such as `query-users`, `view-realm`, `create-client`, etc., if needed for advanced scenarios.
+
+5. In the **Authentication** settings, under **Required Actions**, make sure to **disable all required actions** (none should be enabled).
+
+> **Note:** You must repeat this configuration every time you redeploy or reset your Keycloak instance.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

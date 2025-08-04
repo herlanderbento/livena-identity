@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Livena.Identity.infra.Migrations
 {
     [DbContext(typeof(LivenaIdentityDbContext))]
-    [Migration("20250804084819_InitialIdentitySchema")]
-    partial class InitialIdentitySchema
+    [Migration("20250804091223_CreateUserCodeTables")]
+    partial class CreateUserCodeTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

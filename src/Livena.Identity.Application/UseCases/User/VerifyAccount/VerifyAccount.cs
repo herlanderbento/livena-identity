@@ -33,7 +33,7 @@ public class VerifyAccount : IVerifyAccount
 
         await _userCodeRepository.Update(userCode, cancellationToken);
 
-        user.Activate();
+        user.Verify();
 
         await _userRepository.Update(user, cancellationToken);
     }

@@ -8,15 +8,18 @@ public class VerifyAccount : IVerifyAccount
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserCodeRepository _userCodeRepository;
+    private readonly IKeycloakService _keycloakService;
     private readonly IUnitOfWork _unitOfWork;
 
     public VerifyAccount(
         IUserRepository userRepository,
         IUserCodeRepository userCodeRepository,
+        IKeycloakService keycloakService,
         IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
         _userCodeRepository = userCodeRepository;
+        _keycloakService = keycloakService;
         _unitOfWork = unitOfWork;
     }
 
@@ -40,6 +43,7 @@ public class VerifyAccount : IVerifyAccount
         user.Verify();
 
         await _userRepository.Update(user, cancellationToken);
+        await _keycloakService.Update(user, cancellationToken);
 
         userCode.Use();
 

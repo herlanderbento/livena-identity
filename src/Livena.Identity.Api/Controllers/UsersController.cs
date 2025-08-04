@@ -120,6 +120,7 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Verify(
         [FromBody] VerifyAccountInput request,
         CancellationToken cancellationToken

@@ -40,6 +40,12 @@ public class ApiGlobalExceptionFilter : IExceptionFilter
             details.Type = "WrongCredentials";
             details.Detail = exception!.Message;
         }
+        else if (exception is BadRequestException)
+        {
+            details.Status = StatusCodes.Status400BadRequest;
+            details.Type = "BadRequest";
+            details.Detail = exception!.Message;
+        }
         else
         {
             details.Status = StatusCodes.Status422UnprocessableEntity;

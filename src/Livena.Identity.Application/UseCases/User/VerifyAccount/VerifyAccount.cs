@@ -15,7 +15,8 @@ public class VerifyAccount : IVerifyAccount
         IUserRepository userRepository,
         IUserCodeRepository userCodeRepository,
         IKeycloakService keycloakService,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork
+    )
     {
         _userRepository = userRepository;
         _userCodeRepository = userCodeRepository;
@@ -39,7 +40,7 @@ public class VerifyAccount : IVerifyAccount
         BadRequestException.ThrowIf(userCode!.IsExpired(), "Verification code expired.");
 
         ConflictException.ThrowIf(user.IsVerified == true, "User already verified.");
-    
+
         user.Verify();
 
         await _userRepository.Update(user, cancellationToken);

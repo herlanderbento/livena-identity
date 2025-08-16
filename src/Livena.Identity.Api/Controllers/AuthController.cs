@@ -32,7 +32,7 @@ public class AuthController(IMediator mediator, RequestValidator requestValidato
         return Ok(new ApiPresenter<AuthenticateOutput>(output));
     }
 
-    [HttpDelete("/logout")]
+    [HttpDelete("logout")]
     [Authorize(Roles = $"{Roles.User},{Roles.Admin}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

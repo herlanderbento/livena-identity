@@ -1,5 +1,4 @@
-﻿using Livena.Identity.Application.Exceptions;
-using Livena.Identity.Domain.Entity;
+﻿using Livena.Identity.Domain.Entity;
 using Livena.Identity.Domain.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +17,7 @@ public class UserCodeRepository(LivenaIdentityDbContext context) : IUserCodeRepo
         var model = await UserCodes
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-        
+
         return model!;
     }
 
@@ -29,7 +28,9 @@ public class UserCodeRepository(LivenaIdentityDbContext context) : IUserCodeRepo
     {
         var model = await UserCodes
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+            .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
         return model!;
     }
 

@@ -1,9 +1,9 @@
-﻿using Livena.Identity.Domain.Entity;
+﻿using System.Globalization;
+using Livena.Identity.Domain.Entity;
 using Livena.Identity.Domain.Shared;
 using Livena.Identity.infra.EntityFramework.Configurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using System.Globalization;
 
 namespace Livena.Identity.infra.EntityFramework;
 

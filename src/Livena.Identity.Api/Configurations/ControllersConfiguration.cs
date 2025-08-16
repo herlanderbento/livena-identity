@@ -1,4 +1,6 @@
-﻿using Livena.Identity.Api.Filters;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Livena.Identity.Api.Filters;
 using Livena.Identity.Api.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
@@ -9,7 +11,14 @@ public static class ControllersConfiguration
 {
     public static IServiceCollection AddAndConfigureControllers(this IServiceCollection services)
     {
-        services.AddControllers(options => options.Filters.Add(typeof(ApiGlobalExceptionFilter)));
+        services
+            .AddControllers(options => options.Filters.Add(typeof(ApiGlobalExceptionFilter)))
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.PropertyNamingPolicy =
+                    JsonNamingPolicy.SnakeCaseLower;
+            });
 
         services.Configure<RouteOptions>(options =>
         {

@@ -7,6 +7,7 @@ using Livena.Identity.Application.UseCases.User.CreateUser;
 using Livena.Identity.Application.UseCases.User.DeleteUser;
 using Livena.Identity.Application.UseCases.User.GetUser;
 using Livena.Identity.Application.UseCases.User.ListUsers;
+using Livena.Identity.Application.UseCases.User.SendVerificationCode;
 using Livena.Identity.Application.UseCases.User.UpdateUser;
 using Livena.Identity.Application.UseCases.User.VerifyAccount;
 using Livena.Identity.Domain.Shared.SearchableRepository;
@@ -112,6 +113,20 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var request = new DeleteUserInput(id);
+        await _mediator.Send(request, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPost("send-verification-code")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SendVerificationCode(
+        [FromBody] SendVerificationCodeInput request,
+        CancellationToken cancellationToken
+    )
+    {
+        _requestValidator.Validate(request, cancellationToken);
         await _mediator.Send(request, cancellationToken);
         return NoContent();
     }

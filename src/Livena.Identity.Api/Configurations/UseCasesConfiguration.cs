@@ -3,6 +3,7 @@ using Livena.Identity.Application.Events;
 using Livena.Identity.Application.Interfaces;
 using Livena.Identity.Application.UseCases.User.CreateUser;
 using Livena.Identity.Application.UseCases.User.Logout;
+using Livena.Identity.Application.UseCases.User.SendVerificationCode;
 using Livena.Identity.Application.UseCases.User.UpdateUser;
 using Livena.Identity.Application.UseCases.User.VerifyAccount;
 using Livena.Identity.Domain.Repository;
@@ -51,6 +52,7 @@ public static class UseCasesConfiguration
         services.AddValidatorsFromAssemblyContaining<UpdateUserInputValidator>();
         services.AddValidatorsFromAssemblyContaining<LogoutInputValidator>();
         services.AddValidatorsFromAssemblyContaining<VerifyAccountInputValidator>();
+        services.AddValidatorsFromAssemblyContaining<SendVerificationCodeInputValidator>();
         return services;
     }
 

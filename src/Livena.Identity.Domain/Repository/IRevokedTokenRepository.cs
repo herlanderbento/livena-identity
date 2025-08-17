@@ -6,5 +6,7 @@ namespace Livena.Identity.Domain.Repository;
 
 public interface IRevokedTokenRepository
     : IRepository<RevokedToken>,
-        ISearchableRepository<RevokedToken, string>;
-
+        ISearchableRepository<RevokedToken, string>
+{
+    Task<RevokedToken?> GetByToken(string token, CancellationToken cancellationToken);
+}

@@ -274,8 +274,15 @@ public class KeycloakService : IKeycloakService
         };
     }
 
-    public async Task Logout(string keycloakUserId, CancellationToken cancellationToken)
+    public async Task Logout(string username, CancellationToken cancellationToken)
     {
+        var keycloakUserId = await GetKeycloakIdByUsername(username, cancellationToken);
+
+        if (keycloakUserId == null)
+        {
+            return;
+        }
+
         var request = new HttpRequestMessage(
             HttpMethod.Post,
             $"/admin/realms/{_realm}/users/{keycloakUserId}/logout"

@@ -24,6 +24,15 @@ public class RevokedTokenRepository(LivenaIdentityDbContext context) : IRevokedT
         return model!;
     }
 
+    public async Task<RevokedToken?> GetByToken(string token, CancellationToken cancellationToken)
+    {
+        var model = await RevokedTokens
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.AccessToken == token, cancellationToken);
+
+        return model;
+    }
+
     public async Task<SearchOutput<RevokedToken>> Search(
         SearchInput<string> input,
         CancellationToken cancellationToken

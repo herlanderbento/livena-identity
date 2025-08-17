@@ -84,6 +84,7 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     }
 
     [HttpPatch("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Admin}, {Roles.User}")]
     [ProducesResponseType(typeof(ApiPresenter<UserOutput>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
@@ -108,6 +109,7 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Admin}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)

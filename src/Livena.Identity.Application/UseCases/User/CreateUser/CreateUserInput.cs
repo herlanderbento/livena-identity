@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Livena.Identity.Application.UseCases.User.Common;
-using Livena.Identity.Domain.Enum;
 using MediatR;
 
 namespace Livena.Identity.Application.UseCases.User.CreateUser;

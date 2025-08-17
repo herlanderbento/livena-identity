@@ -5,6 +5,7 @@ using Livena.Identity.Api.Helpers;
 using Livena.Identity.Api.Presenters;
 using Livena.Identity.Api.Validators;
 using Livena.Identity.Application.UseCases.User.Authenticate;
+using Livena.Identity.Application.UseCases.User.ForgotPassword;
 using Livena.Identity.Application.UseCases.User.Logout;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -63,5 +64,19 @@ public class AuthController(IMediator mediator, RequestValidator requestValidato
                 }
             );
         }
+    }
+
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ForgotPassword(
+        [FromBody] ForgotPasswordInput request,
+        CancellationToken cancellationToken
+    )
+    {
+        _requestValidator.Validate(request, cancellationToken);
+        await _mediator.Send(request, cancellationToken);
+        return NoContent();
     }
 }

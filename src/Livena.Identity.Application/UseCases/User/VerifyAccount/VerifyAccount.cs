@@ -44,7 +44,7 @@ public class VerifyAccount : IVerifyAccount
         user.Verify();
 
         await _userRepository.Update(user, cancellationToken);
-        await _keycloakService.Update(user, cancellationToken);
+        await _keycloakService.Update(user, null, cancellationToken);
 
         userCode.Use();
 

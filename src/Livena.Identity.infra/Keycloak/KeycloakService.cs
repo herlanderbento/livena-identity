@@ -183,7 +183,7 @@ public class KeycloakService : IKeycloakService
         return null;
     }
 
-    public async Task Update(User user, CancellationToken cancellationToken)
+    public async Task Update(User user, string? password, CancellationToken cancellationToken)
     {
         var keycloakUserId = await GetKeycloakIdByUsername(user.Username, cancellationToken);
         if (keycloakUserId != null)
@@ -198,6 +198,17 @@ public class KeycloakService : IKeycloakService
                     birthday = user.Birthday.ToString("yyyy-MM-dd"),
                     externalId = user.Id.ToString(),
                 },
+                credentials = password != null
+                    ? new[]
+                    {
+                        new
+                        {
+                            type = "password",
+                            value = password,
+                            temporary = false,
+                        },
+                    }
+                    : null,
             };
 
             var request = new HttpRequestMessage(

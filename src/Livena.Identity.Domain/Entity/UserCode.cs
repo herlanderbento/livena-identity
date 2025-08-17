@@ -29,6 +29,11 @@ public class UserCode : AggregateRoot
         return DateTime.UtcNow >= ExpiresAt;
     }
 
+    public bool IsUsed()
+    {
+        return UsedAt != null;
+    }
+
     public void Use()
     {
         UsedAt = DateTime.UtcNow;

@@ -55,9 +55,13 @@ public class User : AggregateRoot
         Validate();
     }
 
-    public void ChangePassword(string? password)
+    public void ChangePassword(string password)
     {
-        Password = password ?? Password;
+        Password = password;
+
+        UpdatedAt = DateTime.UtcNow;
+
+        Validate();
     }
 
     public void Activate()

@@ -4,6 +4,7 @@ using Livena.Identity.Application.Interfaces;
 using Livena.Identity.Application.UseCases.User.CreateUser;
 using Livena.Identity.Application.UseCases.User.ForgotPassword;
 using Livena.Identity.Application.UseCases.User.Logout;
+using Livena.Identity.Application.UseCases.User.ResetPassword;
 using Livena.Identity.Application.UseCases.User.SendVerificationCode;
 using Livena.Identity.Application.UseCases.User.UpdateUser;
 using Livena.Identity.Application.UseCases.User.VerifyAccount;
@@ -55,6 +56,7 @@ public static class UseCasesConfiguration
         services.AddValidatorsFromAssemblyContaining<VerifyAccountInputValidator>();
         services.AddValidatorsFromAssemblyContaining<SendVerificationCodeInputValidator>();
         services.AddValidatorsFromAssemblyContaining<ForgotPasswordInputValidator>();
+        services.AddValidatorsFromAssemblyContaining<ResetPasswordInputValidator>();
         return services;
     }
 

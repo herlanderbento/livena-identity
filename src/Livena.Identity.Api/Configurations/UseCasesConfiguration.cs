@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Livena.Identity.Application.Events;
 using Livena.Identity.Application.Interfaces;
+using Livena.Identity.Application.UseCases.User.ChangePassword;
 using Livena.Identity.Application.UseCases.User.CreateUser;
 using Livena.Identity.Application.UseCases.User.ForgotPassword;
 using Livena.Identity.Application.UseCases.User.Logout;
@@ -57,6 +58,7 @@ public static class UseCasesConfiguration
         services.AddValidatorsFromAssemblyContaining<SendVerificationCodeInputValidator>();
         services.AddValidatorsFromAssemblyContaining<ForgotPasswordInputValidator>();
         services.AddValidatorsFromAssemblyContaining<ResetPasswordInputValidator>();
+        services.AddValidatorsFromAssemblyContaining<ChangePasswordInputValidator>();
         return services;
     }
 

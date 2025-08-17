@@ -1,7 +1,9 @@
 ﻿using Livena.Identity.Api.ApiModels.User;
 using Livena.Identity.Api.Authorization;
+using Livena.Identity.Api.Helpers;
 using Livena.Identity.Api.Presenters;
 using Livena.Identity.Api.Validators;
+using Livena.Identity.Application.UseCases.User.ChangePassword;
 using Livena.Identity.Application.UseCases.User.Common;
 using Livena.Identity.Application.UseCases.User.CreateUser;
 using Livena.Identity.Application.UseCases.User.DeleteUser;
@@ -145,6 +147,28 @@ public class UsersController(IMediator mediator, RequestValidator requestValidat
     {
         _requestValidator.Validate(request, cancellationToken);
         await _mediator.Send(request, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPatch("change-password")]
+    [Authorize(Roles = $"{Roles.Admin}, {Roles.User}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ChangePassword(
+        [FromBody] ChangePasswordApiInput request,
+        CancellationToken cancellationToken
+    )
+    {
+        var (username, _, _) = JwtTokenHelper.ExtractTokenInfo(
+            User,
+            Request.Headers["Authorization"].ToString()
+        );
+
+        var input = new ChangePasswordInput(username, request.CurrentPassword, request.NewPassword);
+
+        _requestValidator.Validate(input, cancellationToken);
+        await _mediator.Send(input, cancellationToken);
         return NoContent();
     }
 }

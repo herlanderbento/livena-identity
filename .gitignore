@@ -367,6 +367,10 @@ FodyWeavers.xsd
 # GCP credentials 
 gcp_credentials.json
 
+# Environment variables
+.env
+/src/Livena.Identity.Api/.env
+
 # docker volumes
 elastic/.docker/es*
 .docker/filebeat/registry/*

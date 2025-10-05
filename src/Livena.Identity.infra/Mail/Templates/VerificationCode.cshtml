@@ -1,0 +1,53 @@
+﻿@model Livena.Identity.Application.UseCases.User.Common.TemplateModel
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verifica a tua conta</title>
+    <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>Bem-vindo(a), @Model.Username!</h2>
+
+    <p>Obrigado por te juntares à Livena 🎉</p>
+    <p>Antes de começares, precisamos confirmar o teu endereço de e-mail.</p>
+
+    <p>
+        <a href="@Model.Url" class="btn" style="background-color:#16a34a;color:white;">Verificar conta</a>
+    </p>
+
+    <p>Se o botão não funcionar, copia e cola este link no teu navegador:</p>
+    <p><small>@Model.Url</small></p>
+
+    <hr />
+    <p>Ou usa este código de verificação: <strong>@Model.Code</strong> (expira em @Model.ExpireMinutes minutos)</p>
+
+    <p>Se não criaste uma conta na Livena, ignora esta mensagem.</p>
+
+    <p>Com carinho,<br />Equipa Livena</p>
+</div>
+</body>
+
+</html>

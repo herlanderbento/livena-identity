@@ -15,6 +15,8 @@ using Livena.Identity.infra.Cryptography;
 using Livena.Identity.infra.EntityFramework;
 using Livena.Identity.infra.EntityFramework.Repositories;
 using Livena.Identity.infra.Keycloak;
+using Livena.Identity.Infra.Mail;
+using Resend;
 
 namespace Livena.Identity.Api.Configurations;
 
@@ -45,6 +47,35 @@ public static class UseCasesConfiguration
                 client.BaseAddress = new Uri(baseUrl!);
             }
         );
+
+        services.AddOptions();
+        services.AddHttpClient<ResendClient>();
+        services.Configure<ResendClientOptions>(options =>
+        {
+            var configuration = services
+                .BuildServiceProvider()
+                .GetRequiredService<IConfiguration>();
+            var apiKey =
+                configuration["Mail:ResendApiKey"]
+                ?? Environment.GetEnvironmentVariable("RESEND_API_KEY");
+
+            if (string.IsNullOrWhiteSpace(apiKey))
+                throw new InvalidOperationException(
+                    "Resend API key not configured. Provide Mail:ResendApiKey or RESEND_API_KEY."
+                );
+
+            options.ApiToken = apiKey!;
+        });
+        services.AddTransient<IResend, ResendClient>();
+        services.AddScoped<IMailProvider>(sp =>
+        {
+            var resend = sp.GetRequiredService<IResend>();
+            var logger = sp.GetService<ILogger<ResendRazorMailProvider>>();
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var from = configuration["Mail:From"] ?? "no-reply@livena.com";
+
+            return new ResendRazorMailProvider(resend, from, logger);
+        });
 
         return services;
     }

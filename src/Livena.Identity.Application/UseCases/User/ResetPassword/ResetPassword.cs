@@ -33,21 +33,22 @@ public class ResetPassword : IResetPassword
         var userCode = await _userCodeRepository.GetByCode(input.Code, cancellationToken);
 
         if (
-            userCode == null
+            userCode is null
             || userCode.Code != input.Code
             || userCode.Purpose != VerificationPurpose.PasswordReset
         )
-        {
             throw new BadRequestException("Invalid verification code.");
-        }
 
-        BadRequestException.ThrowIf(userCode.IsExpired(), "Verification code expired.");
+        if (userCode.IsExpired())
+            throw new BadRequestException("Verification code expired.");
 
-        BadRequestException.ThrowIf(userCode.IsUsed(), "Verification code already used.");
+        if (userCode.IsUsed())
+            throw new BadRequestException("Verification code already used.");
 
         var user = await _userRepository.GetById(userCode.UserId, cancellationToken);
 
-        NotFoundException.ThrowIfNull(user, $"User {userCode.UserId} not found.");
+        if (user is null)
+            throw new NotFoundException($"User {userCode.UserId} not found.");
 
         var hashedPassword = await _cryptography.HashPassword(input.Password, cancellationToken);
 

@@ -14,13 +14,15 @@ public class CreateUser : ICreateUser
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICryptography _cryptography;
     private readonly IKeycloakService _keycloakService;
+    private readonly IMailProvider _mailProvider;
 
     public CreateUser(
         IUserRepository userRepository,
         IUserCodeRepository userCodeRepository,
         IUnitOfWork unitOfWork,
         ICryptography cryptography,
-        IKeycloakService keycloakService
+        IKeycloakService keycloakService,
+        IMailProvider mailProvider
     )
     {
         _userRepository = userRepository;
@@ -28,6 +30,7 @@ public class CreateUser : ICreateUser
         _unitOfWork = unitOfWork;
         _cryptography = cryptography;
         _keycloakService = keycloakService;
+        _mailProvider = mailProvider;
     }
 
     public async Task<UserOutput> Handle(CreateUserInput input, CancellationToken cancellationToken)
@@ -86,6 +89,28 @@ public class CreateUser : ICreateUser
 
         await _userCodeRepository.Insert(userCode, cancellationToken);
         await _unitOfWork.Commit(cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(input.Email))
+        {
+            var url =
+                $"https://app.livena.com/verify-account?code={Uri.EscapeDataString(userCode.Code)}&userId={entity.Id}";
+
+            var model = new TemplateModel
+            {
+                Username = entity.Username,
+                Url = url,
+                Code = userCode.Code,
+                ExpireMinutes = 15,
+            };
+
+            await _mailProvider.SendFromTemplateAsync(
+                entity.Email!,
+                "Verify your account",
+                "VerificationCode",
+                model,
+                cancellationToken
+            );
+        }
 
         return UserOutput.FromUser(entity);
     }

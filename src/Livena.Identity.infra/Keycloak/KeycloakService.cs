@@ -41,7 +41,7 @@ public class KeycloakService : IKeycloakService
                 attributes = new
                 {
                     phone = user.Phone,
-                    birthday = user.Birthday.ToString("yyyy-MM-dd"),
+                    birthday = user.Birthday?.ToString("yyyy-MM-dd"),
                     externalId = user.Id.ToString(),
                 },
                 credentials = new[]
@@ -195,7 +195,7 @@ public class KeycloakService : IKeycloakService
                 attributes = new
                 {
                     phone = user.Phone,
-                    birthday = user.Birthday.ToString("yyyy-MM-dd"),
+                    birthday = user.Birthday?.ToString("yyyy-MM-dd"),
                     externalId = user.Id.ToString(),
                 },
                 credentials = password != null

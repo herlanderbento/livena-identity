@@ -3,7 +3,6 @@ using Livena.Identity.Domain.Entity;
 using Livena.Identity.Domain.Shared;
 using Livena.Identity.infra.EntityFramework.Configurations;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Livena.Identity.infra.EntityFramework;
 
@@ -12,6 +11,7 @@ public class LivenaIdentityDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<RevokedToken> RevokedTokens => Set<RevokedToken>();
     public DbSet<UserCode> UserCodes => Set<UserCode>();
+    public DbSet<OAuthAccount> OAuthAccounts => Set<OAuthAccount>();
 
     public LivenaIdentityDbContext(DbContextOptions options)
         : base(options) { }
@@ -21,6 +21,7 @@ public class LivenaIdentityDbContext : DbContext
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new RevokedTokenConfiguration());
         modelBuilder.ApplyConfiguration(new UserCodeConfiguration());
+        modelBuilder.ApplyConfiguration(new OAuthAccountConfiguration());
 
         modelBuilder.Ignore<DomainEvent>();
 

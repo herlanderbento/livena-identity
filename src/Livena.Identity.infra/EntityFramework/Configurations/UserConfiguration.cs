@@ -35,6 +35,8 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion(new SnakeCaseEnumToStringConverter<Roles>())
             .IsRequired();
 
+        builder.Property(user => user.Birthday).HasColumnName("birthday").IsRequired(false);
+
         builder.Property(user => user.IsVerified).HasColumnName("is_verified").IsRequired(false);
 
         builder.Property(user => user.IsActive).HasColumnName("is_active").IsRequired();

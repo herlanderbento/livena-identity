@@ -1,6 +1,7 @@
 namespace Livena.Identity.Domain.Shared;
 
-public interface IRepository<TAggregate> where TAggregate: AggregateRoot
+public interface IRepository<TAggregate>
+    where TAggregate : AggregateRoot
 {
     public Task Insert(TAggregate aggregate, CancellationToken cancellationToken);
     public Task<TAggregate> GetById(Guid id, CancellationToken cancellationToken);

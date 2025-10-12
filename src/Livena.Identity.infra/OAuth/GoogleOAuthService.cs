@@ -157,7 +157,7 @@ public class GoogleOAuthService : IOAuthService
             AccessToken = tokenData.AccessToken ?? string.Empty,
             RefreshToken = tokenData.RefreshToken ?? string.Empty,
             ExpiresIn = tokenData.ExpiresIn,
-            IdToken = tokenData.IdToken,
+            IdToken = tokenData.IdToken ?? string.Empty,
         };
     }
 

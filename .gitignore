@@ -370,6 +370,7 @@ gcp_credentials.json
 # Environment variables
 .env
 /src/Livena.Identity.Api/.env
+/src/Livena.Identity.Api/.env.docker
 
 # docker volumes
 elastic/.docker/es*

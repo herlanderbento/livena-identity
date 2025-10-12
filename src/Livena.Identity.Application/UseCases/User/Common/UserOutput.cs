@@ -6,7 +6,7 @@ public record UserOutput
     public string Username { get; set; }
     public string? Email { get; set; }
     public string? Phone { get; set; }
-    public DateTime Birthday { get; set; }
+    public DateTime? Birthday { get; set; }
     public bool? IsVerified { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -17,7 +17,7 @@ public record UserOutput
         string username,
         string? email,
         string? phone,
-        DateTime birthday,
+        DateTime? birthday,
         bool? isVerified,
         bool isActive,
         DateTime createdAt,

@@ -10,7 +10,7 @@ public class User : AggregateRoot
     public string? Email { get; private set; }
     public string? Phone { get; private set; }
     public string Password { get; private set; }
-    public DateTime Birthday { get; private set; }
+    public DateTime? Birthday { get; private set; }
     public Roles Role { get; private set; }
     public bool? IsVerified { get; private set; }
     public bool IsActive { get; private set; }
@@ -22,7 +22,7 @@ public class User : AggregateRoot
         string? email,
         string? phone,
         string password,
-        DateTime birthday,
+        DateTime? birthday,
         Roles role = Roles.User,
         bool? isVerified = false,
         bool isActive = true
@@ -33,7 +33,7 @@ public class User : AggregateRoot
         Email = email ?? null;
         Phone = phone ?? null;
         Password = password;
-        Birthday = DateTimeUtils.EnsureUtc(birthday);
+        Birthday = birthday.HasValue ? DateTimeUtils.EnsureUtc(birthday.Value) : null;
         Role = role;
         IsVerified = isVerified;
         IsActive = isActive;

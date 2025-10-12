@@ -6,6 +6,7 @@ using Livena.Identity.Api.Presenters;
 using Livena.Identity.Api.Validators;
 using Livena.Identity.Application.UseCases.User.Authenticate;
 using Livena.Identity.Application.UseCases.User.ForgotPassword;
+using Livena.Identity.Application.UseCases.User.GoogleAuth;
 using Livena.Identity.Application.UseCases.User.Logout;
 using Livena.Identity.Application.UseCases.User.ResetPassword;
 using MediatR;
@@ -43,10 +44,9 @@ public class AuthController(IMediator mediator, RequestValidator requestValidato
     {
         try
         {
-            var authHeader = Request.Headers["Authorization"].FirstOrDefault();
             var (username, accessToken, expiresAt) = JwtTokenHelper.ExtractTokenInfo(
                 User,
-                authHeader
+                Request.Headers["Authorization"].FirstOrDefault() ?? string.Empty
             );
 
             var input = new LogoutInput(username, accessToken, expiresAt);
@@ -93,5 +93,23 @@ public class AuthController(IMediator mediator, RequestValidator requestValidato
         _requestValidator.Validate(request, cancellationToken);
         await _mediator.Send(request, cancellationToken);
         return NoContent();
+    }
+
+    [HttpPost("google")]
+    [ProducesResponseType(typeof(ApiPresenter<AuthenticateOutput>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> GoogleAuth(
+        [FromBody] GoogleAuthInput request,
+        CancellationToken cancellationToken
+    )
+    {
+        _requestValidator.Validate(request, cancellationToken);
+        var output = await _mediator.Send(request, cancellationToken);
+        return CreatedAtAction(
+            nameof(GoogleAuth),
+            new { },
+            new ApiPresenter<AuthenticateOutput>(output)
+        );
     }
 }

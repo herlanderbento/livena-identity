@@ -4,6 +4,7 @@ using Livena.Identity.Application.Interfaces;
 using Livena.Identity.Application.UseCases.User.ChangePassword;
 using Livena.Identity.Application.UseCases.User.CreateUser;
 using Livena.Identity.Application.UseCases.User.ForgotPassword;
+using Livena.Identity.Application.UseCases.User.GoogleAuth;
 using Livena.Identity.Application.UseCases.User.Logout;
 using Livena.Identity.Application.UseCases.User.ResetPassword;
 using Livena.Identity.Application.UseCases.User.SendVerificationCode;
@@ -15,6 +16,7 @@ using Livena.Identity.infra.Cryptography;
 using Livena.Identity.infra.EntityFramework;
 using Livena.Identity.infra.EntityFramework.Repositories;
 using Livena.Identity.infra.Keycloak;
+using Livena.Identity.infra.OAuth;
 using Livena.Identity.Infra.Mail;
 using Resend;
 
@@ -39,6 +41,8 @@ public static class UseCasesConfiguration
         services.AddTransient<IUserCodeRepository, UserCodeRepository>();
         services.AddTransient<ICryptography, BCryptHasher>();
         services.AddTransient<IUnitOfWork, UnitOfWork>();
+        services.AddTransient<IOAuthAccountRepository, OAuthAccountRepository>();
+        services.AddTransient<IOAuthService, GoogleOAuthService>();
         services.AddHttpClient<IKeycloakService, KeycloakService>(
             (serviceProvider, client) =>
             {
@@ -90,6 +94,7 @@ public static class UseCasesConfiguration
         services.AddValidatorsFromAssemblyContaining<ForgotPasswordInputValidator>();
         services.AddValidatorsFromAssemblyContaining<ResetPasswordInputValidator>();
         services.AddValidatorsFromAssemblyContaining<ChangePasswordInputValidator>();
+        services.AddValidatorsFromAssemblyContaining<GoogleAuthInputValidator>();
         return services;
     }
 

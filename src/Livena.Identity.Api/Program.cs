@@ -14,19 +14,22 @@ builder
     .AddEnvironmentVariables();
 
 var configuration = builder.Configuration;
+
+// Replace the environment variables in the connection string
 var connectionString = configuration.GetConnectionString("IdentityDb");
 if (!string.IsNullOrEmpty(connectionString))
 {
     connectionString = connectionString
-        .Replace("#DB_HOST#", Environment.GetEnvironmentVariable("DB_HOST"))
-        .Replace("#DB_PORT#", Environment.GetEnvironmentVariable("DB_PORT"))
-        .Replace("#DB_NAME#", Environment.GetEnvironmentVariable("DB_NAME"))
-        .Replace("#DB_USER#", Environment.GetEnvironmentVariable("DB_USER"))
-        .Replace("#DB_PASSWORD#", Environment.GetEnvironmentVariable("DB_PASSWORD"));
+        .Replace("${DB_HOST}", Environment.GetEnvironmentVariable("DB_HOST"))
+        .Replace("${DB_PORT}", Environment.GetEnvironmentVariable("DB_PORT"))
+        .Replace("${DB_NAME}", Environment.GetEnvironmentVariable("DB_NAME"))
+        .Replace("${DB_USER}", Environment.GetEnvironmentVariable("DB_USER"))
+        .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD"));
 
     configuration["ConnectionStrings:IdentityDb"] = connectionString;
 }
 
+// Replace the environment variables in the keycloak configuration
 configuration["Keycloak:Realm"] = Environment.GetEnvironmentVariable("KEYCLOAK_REALM");
 configuration["Keycloak:ClientId"] = Environment.GetEnvironmentVariable("KEYCLOAK_CLIENT_ID");
 configuration["Keycloak:ClientSecret"] = Environment.GetEnvironmentVariable(
@@ -35,11 +38,21 @@ configuration["Keycloak:ClientSecret"] = Environment.GetEnvironmentVariable(
 configuration["Keycloak:TokenUrl"] = Environment.GetEnvironmentVariable("KEYCLOAK_TOKEN_URL");
 configuration["Keycloak:BaseUrl"] = Environment.GetEnvironmentVariable("KEYCLOAK_BASE_URL");
 
+// Replace the environment variables in the jwt configuration
 configuration["Jwt:Authority"] = Environment.GetEnvironmentVariable("JWT_AUTHORITY");
 configuration["Jwt:Audience"] = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
 
+// Replace the environment variables in the mail configuration
 configuration["Mail:From"] = Environment.GetEnvironmentVariable("MAIL_FROM");
 configuration["Mail:ResendApiKey"] = Environment.GetEnvironmentVariable("RESEND_API_KEY");
+
+// Replace the environment variables in the google oauth configuration
+configuration["GoogleOAuth:ClientId"] = Environment.GetEnvironmentVariable(
+    "GOOGLE_OAUTH_CLIENT_ID"
+);
+configuration["GoogleOAuth:ClientSecret"] = Environment.GetEnvironmentVariable(
+    "GOOGLE_OAUTH_CLIENT_SECRET"
+);
 
 builder
     .Services.AddAppConnections(builder.Configuration)

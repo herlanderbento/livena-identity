@@ -1,6 +1,5 @@
 using Livena.Identity.Domain.Entity;
 using Livena.Identity.Domain.Repository;
-using Livena.Identity.infra.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
 namespace Livena.Identity.infra.EntityFramework.Repositories;
@@ -12,6 +11,21 @@ public class OAuthAccountRepository : IOAuthAccountRepository
     public OAuthAccountRepository(LivenaIdentityDbContext context)
     {
         _context = context;
+    }
+
+    public async Task Insert(OAuthAccount oAuthAccount, CancellationToken cancellationToken)
+    {
+        await _context.OAuthAccounts.AddAsync(oAuthAccount, cancellationToken);
+    }
+
+    public async Task<OAuthAccount> GetById(Guid id, CancellationToken cancellationToken)
+    {
+        var model = await _context.OAuthAccounts.FirstOrDefaultAsync(
+            oa => oa.Id == id,
+            cancellationToken
+        );
+
+        return model!;
     }
 
     public async Task<OAuthAccount?> GetByUserIdAndProvider(
@@ -38,23 +52,14 @@ public class OAuthAccountRepository : IOAuthAccountRepository
         );
     }
 
-    public async Task Insert(OAuthAccount oAuthAccount, CancellationToken cancellationToken)
-    {
-        await _context.OAuthAccounts.AddAsync(oAuthAccount, cancellationToken);
-    }
-
     public async Task Update(OAuthAccount oAuthAccount, CancellationToken cancellationToken)
     {
         _context.OAuthAccounts.Update(oAuthAccount);
         await Task.CompletedTask;
     }
 
-    public async Task Delete(Guid id, CancellationToken cancellationToken)
+    public Task Delete(OAuthAccount aggregate, CancellationToken cancellationToken)
     {
-        var oAuthAccount = await _context.OAuthAccounts.FindAsync([id], cancellationToken);
-        if (oAuthAccount != null)
-        {
-            _context.OAuthAccounts.Remove(oAuthAccount);
-        }
+        return Task.FromResult(_context.OAuthAccounts.Remove(aggregate));
     }
 }
